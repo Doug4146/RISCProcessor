@@ -1,0 +1,39 @@
+module RegisterFile(
+	input clk,
+	input clear,
+	input write_enable,            
+   input [3:0] Reg_Select,        
+   input [31:0] BusMuxOut,        
+   output [31:0] BusMuxIn
+	
+	
+	// 1. Internal wires to connect to the 16 registers
+    wire [31:0] reg_outputs [15:0]; // Array to hold output of each register
+    wire [15:0] reg_enables;        // Individual enable signals for each register
+
+    // 2. Decoder Logic: Only enable the register matching Reg_Select
+    // If write_enable is high, shift a 1 to the position of Reg_Select.
+    // Example: If Reg_Select is 2 (binary 0010), reg_enables becomes ...00000100
+    assign reg_enables = (write_enable) ? (16'b1 << Reg_Select) : 16'b0;
+
+    // 3. Instantiate the 16 Registers using a Generate Loop
+    genvar i;
+    generate
+        for (i = 0; i < 16; i = i + 1) begin : reg_gen
+            register32 R (
+                .clock(clock),
+                .clear(clear),
+                .enable(reg_enables[i]),  // Only high for the selected register
+                .BusMuxOut(BusMuxOut),    // All registers see the input data
+                .BusMuxIn(reg_outputs[i]) // Output goes to our internal array
+            );
+        end
+    endgenerate
+
+    // 4. Output Multiplexer (The "Select Logic")
+    // This selects which register data flows out to the main BusMuxIn
+    // based on the Reg_Select address.
+    assign BusMuxIn = reg_outputs[Reg_Select];
+
+endmodule
+);
