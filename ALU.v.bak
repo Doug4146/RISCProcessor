@@ -1,37 +1,22 @@
-module ALU(
-    input  [31:0] A,           // 32-bit input from Y
-    input  [31:0] B,           // 32-bit input from Bus
-    input  [4:0]  OpCode,      // Control signal (5 bits to match diagram)
-    output reg [63:0] C        // 64-bit output to Z register
+module alu(
+	output reg [63:0] Rc,
+	input wire [31:0] Ra, Rb,
+	input wire [4:0] opcode
 );
 
-    always @(*) begin
-        case (OpCode)
-            // --- Arithmetic Operations ---
-            5'd0: C = A + B;                    // ADD (Result is 32-bit, upper bits 0)
-            5'd1: C = A - B;                    // SUB
-            5'd2: C = A * B;                    // MUL (Result is 64-bit!)
-            5'd3: C = A / B;                    // DIV (Integer division)
-
-            // --- Logical Operations ---
-            5'd4: C = {32'b0, (A & B)};         // AND
-            5'd5: C = {32'b0, (A | B)};         // OR
-            5'd6: C = {32'b0, (~A)};            // NOT (Invert A)
-            5'd7: C = {32'b0, (~A + 1'b1)};     // NEG (2's Complement Negation)
-
-            // --- Shift Operations ---
-            5'd8: C = {32'b0, (A << B[4:0])};   // SHL (Shift Left)
-            5'd9: C = {32'b0, (A >> B[4:0])};   // SHR (Shift Right Logical)
-            5'd10: C = {32'b0, (A >>> B[4:0])}; // SRA (Shift Right Arithmetic - preserves sign)
-            
-            // --- Rotate Operations (Optional but listed in diagram) ---
-            // ROL (Rotate Left): (A << B) | (A >> (32-B))
-            5'd11: C = {32'b0, ((A << B[4:0]) | (A >> (32 - B[4:0])))};
-            // ROR (Rotate Right): (A >> B) | (A << (32-B))
-            5'd12: C = {32'b0, ((A >> B[4:0]) | (A << (32 - B[4:0])))};
-
-            default: C = 64'b0;                 // Default safe state
-        endcase
-    end
-
-endmodule
+	parameter
+	Add = 5'b00000,
+	Sub = 5'b00001,
+	And = 5'b00010,
+	Or = 5'b00011,
+	Shr = 5'b00100,
+	Shra = 5'b00101,
+	Shl = 5'b00110,
+	Ror = 5'b00111,
+	Rol = 5'b01000,
+	Div = 5'b01100,
+	Mul = 5'b01101,
+	Neg = 5'b01110,
+	Not = 5'b01111;
+	
+	
