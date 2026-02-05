@@ -13,11 +13,11 @@ module rc_adder (
 		for (i = 0; i < 32; i = i + 1) 
 		begin : adder_loop
 			full_adder fa (
-				.sum(Sout[i]),
-				.cout(c[i+1]), 
-				.a(Ra[i]),
-				.b(Rb[i]),
-				.cin(c[i])     
+				Sout[i],
+				c[i+1], 
+				Ra[i],
+				Rb[i],
+				c[i]     
 			);
 		end
 	endgenerate
