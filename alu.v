@@ -19,6 +19,36 @@ module alu(
 	Neg = 5'b01110,
 	Not = 5'b01111;
 	
-
+	wire [31:0] and_out, or_out, not_out, add_s, add_c;
 	
+	and_32_bit and_op(and_out, Ra, Rb);
+	or_32_bit or_op(or_out, Ra, Rb);
+	not_32_bit not_op(not_out, Ra);
+	rc_adder add(add_s, add_c, Ra, Rb, 5'b00000);
+
+	always @(*)
+		begin
+			case (opcode)
+			
+				Add: begin
+					Rc[31:0] = add_s[31:0];
+					Rc[63:32] = 32'd0;
+				end
+				
+				And: begin
+					Rc[31:0] = and_out[31:0];
+					Rc[63:32] = 32'd0;
+				end
+				
+				Or: begin
+					Rc[31:0] = or_out[31:0];
+					Rc[63:32] = 32'd0;
+				end
+				
+				Not: begin
+					Rc[31:0] = not_out[31:0];
+					Rc[63:32] = 32'd0;
+				end
+		end
+endmodule
 	

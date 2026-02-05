@@ -16,6 +16,8 @@ module datapath (
 	 
 	 input PCin, IRin, Yin, Zin, MDRin, MARin, HIin, LOin,
 	 
+	 input [4:0] alu_op,
+	 
 	 input [31:0] Mdatain,
 	 input Read
 	
@@ -31,6 +33,9 @@ module datapath (
 	 wire [31:0] BusMuxInHI, BusMuxInLO, BusMuxInZhigh, BusMuxInZlow;
     wire [31:0] BusMuxInPC, BusMuxInMDR, BusMuxInInPort, BusMuxInC;
     wire [31:0] MARout;
+	 
+	 wire [31:0] Y_value;
+	 wire [63:0] alu_result;
 	 
 	 bus Bus (
 		//Select Signals
@@ -81,24 +86,39 @@ module datapath (
 
     register HI (.clock(clock), .clear(clear), .enable(HIin), .BusMuxOut(BusMuxOut), .BusMuxIn(BusMuxInHI));
     register LO (.clock(clock), .clear(clear), .enable(LOin), .BusMuxOut(BusMuxOut), .BusMuxIn(BusMuxInLO));
-
-    register Y (.clock(clock), .clear(clear), .enable(Yin), .BusMuxOut(BusMuxOut), .BusMuxIn(Y_out));
-
-    register ZHi (.clock(clock), .clear(clear), .enable(Zin), .BusMuxOut(BusMuxOut), .BusMuxIn(BusMuxInZhigh)); // Placeholder connection
-    register ZLo (.clock(clock), .clear(clear), .enable(Zin), .BusMuxOut(BusMuxOut), .BusMuxIn(BusMuxInZlow));  // Placeholder connection
-    
-    // MAR (Output goes to Memory, not Bus)
+	 
+	 register Y (
+		.clock(clock), .clear(clear), .enable(Yin), 
+		.BusMuxOut(BusMuxOut), 
+		.BusMuxIn(Y_value)     
+	 );
+	 register ZHi (
+		.clock(clock), .clear(clear), .enable(Zin), 
+		.BusMuxOut(ALU_Result[63:32]),
+		.BusMuxIn(BusMuxInZhigh)       
+	 );
+	 register ZLo (
+		.clock(clock), .clear(clear), .enable(Zin), 
+		.BusMuxOut(ALU_Result[31:0]),  
+		.BusMuxIn(BusMuxInZlow)        
+	 );	
+	 
     register MAR (.clock(clock), .clear(clear), .enable(MARin), .BusMuxOut(BusMuxOut), .BusMuxIn(MARout));	 
 	 
 	 mdr MDR_Unit (
-        .clock(clock), .clear(clear), .enable(MDRin), 
-        .BusMuxOut(BusMuxOut), 
-        .mem_data(Mdatain),      // External Memory Data
-        .read_signal(Read),     // Read Control Signal
-        .mdr_out(BusMuxInMDR)
+		.clock(clock), .clear(clear), .enable(MDRin), 
+		.BusMuxOut(BusMuxOut), 
+		.mem_data(Mdatain),
+		.read_signal(Read),
+		.mdr_out(BusMuxInMDR)
     );
 	 
+	 alu ALU_Unit(
+		.Rc(alu_result),
+		.Ra(Y_value),
+		.Rb(BusMuxOut),
+		.opcode(alu_op)
+	);
 	 
 	 
-    
 endmodule

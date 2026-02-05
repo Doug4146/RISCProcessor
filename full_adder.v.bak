@@ -1,0 +1,8 @@
+module full_adder(
+	input Ra, Rb, Cin
+	output sum, carry
+);
+
+	assign sum = Ra ^ Rb ^ cin;
+	assign carry = (Ra&Rb) | (Rb&Cin) | (Cin&Ra)
+endmodule
