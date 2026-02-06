@@ -80,7 +80,7 @@ module datapath (
 
 
 	 register PC (clock, clear, PCin, BusMuxOut, BusMuxInPC);
-    register IR (clock, clear, IRin, BusMuxOut, .BusMuxIn()); 
+    register IR (clock, clear, IRin, BusMuxOut); 
 
     register HI (clock, clear, HIin, BusMuxOut, BusMuxInHI);
     register LO (clock, clear, LOin, BusMuxOut, BusMuxInLO);
@@ -92,12 +92,12 @@ module datapath (
 	 );
 	 register ZHi (
 		clock, clear, Zin, 
-		ALU_Result[63:32],
+		alu_result[63:32],
 		BusMuxInZhigh       
 	 );
 	 register ZLo (
 		clock, clear, Zin, 
-		ALU_Result[31:0],  
+		alu_result[31:0],  
 		BusMuxInZlow        
 	 );	
 	 

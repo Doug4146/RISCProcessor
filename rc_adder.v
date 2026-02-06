@@ -2,7 +2,8 @@ module rc_adder (
 	output wire [31:0] Sout,
 	output wire Cout,
 	input wire [31:0] Ra, Rb, 
-	input wire Cin);
+	input wire Cin
+);
 	
 	wire [32:0] c; 
 
