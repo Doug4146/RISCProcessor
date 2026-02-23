@@ -1,0 +1,10 @@
+module ror_32_bit (
+	output reg[31:0] Rz,
+	input reg[31:0] Ra,
+	input reg[31:0] NumberRot
+);
+	always@(*) begin
+		Rz = (Ra >> NumberRot) | (A << (32-NumberRot));
+	end
+endmodule
+	

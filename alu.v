@@ -20,6 +20,7 @@ module alu(
 	Not = 5'b01111;
 	
 	wire [31:0] and_out, or_out, not_out, add_s, sub_s, neg_out;
+	wire [31:0] shr_out, shra_out, shl_out, ror_out, rol_out;
 	wire add_c, sub_c;
 	
 	and_32_bit and_op(and_out, Ra, Rb);
@@ -28,6 +29,12 @@ module alu(
 	rc_adder add(add_s, add_c, Ra, Rb, 1'b0);
 	rc_adder sub(sub_s, sub_c, Ra, not_out, 1'b1);
 	neg_32_bit neg(neg_out, Ra);
+	shr_32_bit shr(shr_out, Ra, Rb);
+	shra_32_bit shra(shra_out, Ra, Rb);
+	shl_32_bit shl(shl_out, Ra, Rb)
+	ror_32_bit ror(ror_out, Ra, Rb)
+	rol_32_bit rol(rol_out, Ra, Rb)
+
 
 	always @(*)
 		begin
@@ -52,6 +59,31 @@ module alu(
 					Rc[31:0] = or_out[31:0];
 					Rc[63:32] = 32'd0;
 				end
+				
+				Shr: begin
+                Rc[31:0] = shr_out[31:0];
+                Rc[63:32] = 32'd0;
+            end
+
+            Shra: begin
+                Rc[31:0] = shra_out[31:0];
+                Rc[63:32] = 32'd0;
+            end
+
+            Shl: begin
+                Rc[31:0] = shl_out[31:0];
+                Rc[63:32] = 32'd0;
+            end
+
+            Ror: begin
+                Rc[31:0] = ror_out[31:0];
+                Rc[63:32] = 32'd0;
+            end
+
+            Rol: begin
+                Rc[31:0] = rol_out[31:0];
+                Rc[63:32] = 32'd0;
+            end
 				
 				Neg: begin
 					Rc[31:0] = neg_out[31:0];
