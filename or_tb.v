@@ -1,6 +1,6 @@
 `timescale 1ns/10ps
 
-module datapath_tb;
+module or_tb;
 
     reg clock, clear;
     
@@ -10,9 +10,7 @@ module datapath_tb;
     reg R2in, R5in, R6in;
     
     reg Read, IncPC;
-    
-    // 1. Replaced opcode with individual 1-bit ALU control signals [cite: 296]
-    reg AND, OR, ADD, SUB;         
+    reg OR;         
     reg [31:0] Mdatain;
     
     parameter Default = 4'b0000, Reg_load1a = 4'b0001, Reg_load1b = 4'b0010, Reg_load2a = 4'b0011,
@@ -21,7 +19,6 @@ module datapath_tb;
               
     reg [3:0] Present_state = Default;
 
-    // 2. Updated datapath instantiation to match the new 1-bit signals
     datapath DUT (
         .clock(clock),
         .clear(clear),
@@ -40,10 +37,7 @@ module datapath_tb;
         .R5in(R5in), 
         .R6in(R6in),
         .Read(Read),
-        .AND(AND),
-        .OR(OR),
-        .ADD(ADD),
-        .SUB(SUB),     
+        .OR(OR),     
         .Mdatain(Mdatain)
     );
 
@@ -76,11 +70,7 @@ module datapath_tb;
         // reset everything to 0 at the start of every state
         BusMuxOutPC = 0; BusMuxOutZlow = 0; BusMuxOutMDR = 0; BusMuxOutR5 = 0; BusMuxOutR6 = 0;
         MARin = 0; Zin = 0; PCin = 0; MDRin = 0; IRin = 0; Yin = 0;
-        IncPC = 0; Read = 0; 
-        
-        // 3. Reset individual ALU signals to 0 [cite: 341]
-        AND = 0; OR = 0; ADD = 0; SUB = 0; 
-        
+        IncPC = 0; Read = 0; OR = 0; 
         R2in = 0; R5in = 0; R6in = 0; Mdatain = 32'h00000000;
 
         case (Present_state)
@@ -96,10 +86,7 @@ module datapath_tb;
             T1: begin BusMuxOutZlow = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h112B0000; end
             T2: begin BusMuxOutMDR = 1; IRin = 1; end
             T3: begin BusMuxOutR5 = 1; Yin = 1; end
-            
-            // 4. Assert the 1-bit OR control signal in T4 [cite: 543]
             T4: begin BusMuxOutR6 = 1; OR = 1; Zin = 1; end
-            
             T5: begin BusMuxOutZlow = 1; R2in = 1; end
         endcase
     end

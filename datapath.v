@@ -16,7 +16,7 @@ module datapath (
 	 
 	 input PCin, IRin, Yin, Zin, MDRin, MARin, HIin, LOin,
 	 
-	 input [4:0] alu_op,
+	 input ADD, SUB, AND, OR, SHR, SHRA, SHL, ROR, ROL, DIV, MUL, NEG, NOT,	
 	 
 	 input [31:0] Mdatain,
 	 input Read,
@@ -120,7 +120,7 @@ module datapath (
 		alu_result,
 		Y_value,
 		BusMuxOut,
-		alu_op
+		ADD, SUB, AND, OR, SHR, SHRA, SHL, ROR, ROL, DIV, MUL, NEG, NOT
 	);
 	 
 	 
