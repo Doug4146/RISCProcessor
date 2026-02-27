@@ -12,14 +12,16 @@ module datapath (
 	 input BusMuxOutInPort, BusMuxOutC,
 	 
 	 input R0in, R1in, R2in, R3in, R4in, R5in, R6in, R7in,
-	 input R8in, R9in, R10in, R11in, R12in, R13in, R14in, R15in, R16in,
+	 input R8in, R9in, R10in, R11in, R12in, R13in, R14in, R15in,
 	 
 	 input PCin, IRin, Yin, Zin, MDRin, MARin, HIin, LOin,
 	 
 	 input [4:0] alu_op,
 	 
 	 input [31:0] Mdatain,
-	 input Read
+	 input Read,
+	 
+	 output wire [31:0] MARout
 	
 );
     // Bus wires
@@ -32,7 +34,8 @@ module datapath (
 	 
 	 wire [31:0] BusMuxInHI, BusMuxInLO, BusMuxInZhigh, BusMuxInZlow;
     wire [31:0] BusMuxInPC, BusMuxInMDR, BusMuxInInPort, BusMuxInC;
-    wire [31:0] MARout;
+	 
+	 wire [31:0] IR_out;
 	 
 	 wire [31:0] Y_value;
 	 wire [63:0] alu_result;
@@ -61,57 +64,56 @@ module datapath (
 		BusMuxOut
     );
 	 
-	 register R0 (clock, clear, R0in, BusMuxOut, BusMuxInR0);
-	 register R1 (clock, clear, R1in, BusMuxOut, BusMuxInR1);	 
-	 register R2 (clock, clear, R2in, BusMuxOut, BusMuxInR2);
-	 register R3 (clock, clear, R3in, BusMuxOut, BusMuxInR3);
-	 register R4 (clock, clear, R4in, BusMuxOut, BusMuxInR4);
-	 register R5 (clock, clear, R5in, BusMuxOut, BusMuxInR5);
-	 register R6 (clock, clear, R6in, BusMuxOut, BusMuxInR6);
-	 register R7 (clock, clear, R7in, BusMuxOut, BusMuxInR7);
-	 register R8 (clock, clear, R8in, BusMuxOut, BusMuxInR8);
-	 register R9 (clock, clear, R9in, BusMuxOut, BusMuxInR9);
-	 register R10 (clock, clear, R10in, BusMuxOut, BusMuxInR10);
-	 register R11 (clock, clear, R11in, BusMuxOut, BusMuxInR11);
-	 register R12 (clock, clear, R12in, BusMuxOut, BusMuxInR12);
-	 register R13 (clock, clear, R13in, BusMuxOut, BusMuxInR13);
-	 register R14 (clock, clear, R14in, BusMuxOut, BusMuxInR14);
-	 register R15 (clock, clear, R15in, BusMuxOut, BusMuxInR15);
+	 register R0 (BusMuxInR0, clock, clear, R0in, BusMuxOut);
+	 register R1 (BusMuxInR1, clock, clear, R1in, BusMuxOut);	 
+	 register R2 (BusMuxInR2, clock, clear, R2in, BusMuxOut);
+	 register R3 (BusMuxInR3, clock, clear, R3in, BusMuxOut);
+	 register R4 (BusMuxInR4, clock, clear, R4in, BusMuxOut);
+	 register R5 (BusMuxInR5, clock, clear, R5in, BusMuxOut);
+	 register R6 (BusMuxInR6, clock, clear, R6in, BusMuxOut);
+	 register R7 (BusMuxInR7, clock, clear, R7in, BusMuxOut);
+	 register R8 (BusMuxInR8, clock, clear, R8in, BusMuxOut);
+	 register R9 (BusMuxInR9, clock, clear, R9in, BusMuxOut);
+	 register R10 (BusMuxInR10, clock, clear, R10in, BusMuxOut);
+	 register R11 (BusMuxInR11, clock, clear, R11in, BusMuxOut);
+	 register R12 (BusMuxInR12, clock, clear, R12in, BusMuxOut);
+	 register R13 (BusMuxInR13, clock, clear, R13in, BusMuxOut);
+	 register R14 (BusMuxInR14, clock, clear, R14in, BusMuxOut);
+	 register R15 (BusMuxInR15, clock, clear, R15in, BusMuxOut);
 
 
-	 register PC (clock, clear, PCin, BusMuxOut, BusMuxInPC);
-    register IR (clock, clear, IRin, BusMuxOut); 
+	 register PC (BusMuxInPC, clock, clear, PCin, BusMuxOut);
+    register IR (IR_out, clock, clear, IRin, BusMuxOut); 
 
-    register HI (clock, clear, HIin, BusMuxOut, BusMuxInHI);
-    register LO (clock, clear, LOin, BusMuxOut, BusMuxInLO);
+    register HI (BusMuxInHI, clock, clear, HIin, BusMuxOut);
+    register LO (BusMuxInLO, clock, clear, LOin, BusMuxOut);
 	 
 	 register Y (
+		Y_value, 
 		clock, clear, Yin, 
-		BusMuxOut, 
-		Y_value    
+		BusMuxOut
 	 );
 	 register ZHi (
+		BusMuxInZhigh,
 		clock, clear, Zin, 
-		alu_result[63:32],
-		BusMuxInZhigh       
+		alu_result[63:32]  
 	 );
 	 register ZLo (
+		BusMuxInZlow,
 		clock, clear, Zin, 
-		alu_result[31:0],  
-		BusMuxInZlow        
+		alu_result[31:0]      
 	 );	
 	 
-    register MAR (clock, clear, MARin, 
-		BusMuxOut, 
-		MARout
+    register MAR (
+		MARout,
+		clock, clear, MARin, 
+		BusMuxOut
 	 );	 
 	 
 	 mdr MDR_Unit (
-		clock, clear, MDRin, 
-		BusMuxOut, 
-		Mdatain,
+		BusMuxInMDR, BusMuxOut, Mdatain,
 		Read,
-		BusMuxInMDR
+		clock, clear, MDRin
     );
 	 
 	 alu ALU_Unit(

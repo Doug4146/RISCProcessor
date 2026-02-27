@@ -5,19 +5,19 @@ module alu(
 );
 
 	parameter
-	Add = 5'b00000,
-	Sub = 5'b00001,
-	And = 5'b00010,
-	Or = 5'b00011,
-	Shr = 5'b00100,
-	Shra = 5'b00101,
-	Shl = 5'b00110,
-	Ror = 5'b00111,
-	Rol = 5'b01000,
-	Div = 5'b01100,
-	Mul = 5'b01101,
-	Neg = 5'b01110,
-	Not = 5'b01111;
+		Add = 5'b00000,
+		Sub = 5'b00001,
+		And = 5'b00010,
+		Or = 5'b00011,
+		Shr = 5'b00100,
+		Shra = 5'b00101,
+		Shl = 5'b00110,
+		Ror = 5'b00111,
+		Rol = 5'b01000,
+		Div = 5'b01100,
+		Mul = 5'b01101,
+		Neg = 5'b01110,
+		Not = 5'b01111;
 	
 	wire [31:0] and_out, or_out, not_out, add_s, sub_s, neg_out;
 	wire [31:0] shr_out, shra_out, shl_out, ror_out, rol_out;
@@ -31,9 +31,9 @@ module alu(
 	neg_32_bit neg(neg_out, Ra);
 	shr_32_bit shr(shr_out, Ra, Rb);
 	shra_32_bit shra(shra_out, Ra, Rb);
-	shl_32_bit shl(shl_out, Ra, Rb)
-	ror_32_bit ror(ror_out, Ra, Rb)
-	rol_32_bit rol(rol_out, Ra, Rb)
+	shl_32_bit shl(shl_out, Ra, Rb);
+	ror_32_bit ror(ror_out, Ra, Rb);
+	rol_32_bit rol(rol_out, Ra, Rb);
 
 
 	always @(*)

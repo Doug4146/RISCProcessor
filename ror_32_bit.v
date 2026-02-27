@@ -5,7 +5,7 @@ module ror_32_bit (
 );
 	wire [4:0] Rotate = Number[4:0];
 	always@(*) begin
-		Rz = (Ra >> Rotate) | (Ra << (5'd32 - Rotate));
+		Rz = (Ra >> Rotate) | (Ra << (32 - Rotate));
 	end
 endmodule
 	

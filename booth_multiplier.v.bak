@@ -8,6 +8,6 @@ module booth_multiplier(
 	wire [64:0] prod;
 	wire [31:0] M;
 	wire [4:0] count;
-endmodule
+	
 	
 	
