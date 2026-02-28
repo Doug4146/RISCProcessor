@@ -13,7 +13,7 @@ module alu(
     not_32_bit not_op(not_out, Rb);
     rc_adder add(add_s, add_c, Ra, Rb, 1'b0);
     rc_adder sub(sub_s, sub_c, Ra, not_out, 1'b1);
-    neg_32_bit neg(neg_out, Ra);
+    neg_32_bit neg(neg_out, Rb);
     shr_32_bit shr(shr_out, Ra, Rb);
     shra_32_bit shra(shra_out, Ra, Rb);
     shl_32_bit shl(shl_out, Ra, Rb);

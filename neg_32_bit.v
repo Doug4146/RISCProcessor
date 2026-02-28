@@ -3,10 +3,17 @@ module neg_32_bit(
 	input wire [31:0] Ra
 );
 
-	wire [31:0] Sout;
+	wire [31:0] not_ra;
 	wire Cout;
 	
-	not_32_bit not_res(Sout, Ra);
-	rc_adder add(Cout, Rb, 32'h00000000, Sout, 32'h00000001);
+	not_32_bit not_res(not_ra, Ra);
+	
+	rc_adder add(
+		.Sout(Rb),
+		.Cout(Cout),
+		.Ra(not_ra),
+		.Rb(32'h00000000),
+		.Cin(1'b1)
+	);
 	
 endmodule
