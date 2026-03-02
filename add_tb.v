@@ -74,7 +74,7 @@ module add_tb;
         R2in = 0; R5in = 0; R6in = 0; Mdatain = 32'h00000000;
 
         case (Present_state)
-            Reg_load1a: begin Mdatain = 32'h00000034; Read = 1; MDRin = 1; end
+            Reg_load1a: begin Mdatain = -1*32'h00000034; Read = 1; MDRin = 1; end
             Reg_load1b: begin MDRout = 1; R5in = 1; end
             Reg_load2a: begin Mdatain = 32'h00000045; Read = 1; MDRin = 1; end
             Reg_load2b: begin MDRout = 1; R6in = 1; end

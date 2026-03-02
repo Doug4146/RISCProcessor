@@ -27,7 +27,8 @@ module mul_tb;
         .clock(clock),
         .clear(clear),
         .PCout(PCout), 
-        .Zlowout(Zlowout), 
+        .Zlowout(Zlowout),
+		  .Zhighout(Zhighout), 
         .MDRout(MDRout),
         .R1out(R1out), 
         .R3out(R3out),
@@ -80,9 +81,9 @@ module mul_tb;
         IncPC = 0; Read = 0; MUL = 0; MUL_start = 0; R1in = 0; R3in = 0; Mdatain = 32'h00000000;
 
         case (Present_state)
-            Reg_load1a: begin Mdatain = 32'h00000004; Read = 1; MDRin = 1; end
+            Reg_load1a: begin Mdatain = -1*32'h00000004; Read = 1; MDRin = 1; end
             Reg_load1b: begin MDRout = 1; R3in = 1; end
-            Reg_load2a: begin Mdatain = 32'h00000005; Read = 1; MDRin = 1; end
+            Reg_load2a: begin Mdatain = -1*32'h00000005; Read = 1; MDRin = 1; end
             Reg_load2b: begin MDRout = 1; R1in = 1; end
 
             // instruction execution

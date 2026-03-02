@@ -6,6 +6,6 @@ module shra_32_bit(
 
 	always@(*) 
 	begin
-		 Rz = Ra >>> ShiftBits;
+		 Rz = $signed(Ra) >>> ShiftBits[4:0];
 	end
 endmodule
