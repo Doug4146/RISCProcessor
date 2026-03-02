@@ -83,7 +83,7 @@ module add_tb;
 
             // instruction execution
             T0: begin PCout = 1; MARin = 1; IncPC = 1; Zin = 1; end
-            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h112B0000; end
+            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h012B0000; end
             T2: begin MDRout = 1; IRin = 1; end
             T3: begin R5out = 1; Yin = 1; end
             T4: begin R6out = 1; ADD = 1; Zin = 1; end

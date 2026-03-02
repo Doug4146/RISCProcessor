@@ -75,7 +75,7 @@ module not_tb;
 
             // instruction execution
             T0: begin PCout = 1; MARin = 1; IncPC = 1; Zin = 1; end
-            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h112B0000; end
+            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h7A380000; end
             T2: begin MDRout = 1; IRin = 1; end
             T3: begin R7out = 1; NOT = 1; Zin = 1; end
             T4: begin Zlowout = 1; R4in = 1; end
