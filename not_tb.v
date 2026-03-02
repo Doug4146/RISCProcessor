@@ -4,7 +4,7 @@ module not_tb;
 
     reg clock, clear;
     
-    reg BusMuxOutPC, BusMuxOutZlow, BusMuxOutMDR, BusMuxOutR7;
+    reg PCout, Zlowout, MDRout, R7out;
     
     reg MARin, Zin, PCin, MDRin, IRin, Yin;
     reg R4in, R7in;
@@ -22,10 +22,10 @@ module not_tb;
     datapath DUT (
         .clock(clock),
         .clear(clear),
-        .BusMuxOutPC(BusMuxOutPC), 
-        .BusMuxOutZlow(BusMuxOutZlow), 
-        .BusMuxOutMDR(BusMuxOutMDR),
-		  .BusMuxOutR7(BusMuxOutR7),
+        .PCout(PCout), 
+        .Zlowout(Zlowout), 
+        .MDRout(MDRout),
+        .R7out(R7out),
         .MARin(MARin), 
         .Zin(Zin), 
         .PCin(PCin), 
@@ -63,22 +63,22 @@ module not_tb;
 
     always @(Present_state) begin
         // reset everything to 0 at the start of every state
-        BusMuxOutPC = 0; BusMuxOutZlow = 0; BusMuxOutMDR = 0; BusMuxOutR7 = 0;
+        PCout = 0; Zlowout = 0; MDRout = 0; R7out = 0;
         MARin = 0; Zin = 0; PCin = 0; MDRin = 0; IRin = 0; Yin = 0;
         IncPC = 0; Read = 0; NOT = 0; R4in = 0; R7in = 0; Mdatain = 32'h00000000;
 
         case (Present_state)
             Reg_load1a: begin Mdatain = 32'h00000005; Read = 1; MDRin = 1; end
-            Reg_load1b: begin BusMuxOutMDR = 1; R7in = 1; end
+            Reg_load1b: begin MDRout = 1; R7in = 1; end
             Reg_load2a: begin Mdatain = 32'h00000002; Read = 1; MDRin = 1; end
-            Reg_load2b: begin BusMuxOutMDR = 1; R4in = 1; end
+            Reg_load2b: begin MDRout = 1; R4in = 1; end
 
             // instruction execution
-            T0: begin BusMuxOutPC = 1; MARin = 1; IncPC = 1; Zin = 1; end
-            T1: begin BusMuxOutZlow = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h112B0000; end
-            T2: begin BusMuxOutMDR = 1; IRin = 1; end
-            T3: begin BusMuxOutR7 = 1; NOT = 1; Zin = 1; end
-            T4: begin BusMuxOutZlow = 1; R4in = 1; end
+            T0: begin PCout = 1; MARin = 1; IncPC = 1; Zin = 1; end
+            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h112B0000; end
+            T2: begin MDRout = 1; IRin = 1; end
+            T3: begin R7out = 1; NOT = 1; Zin = 1; end
+            T4: begin Zlowout = 1; R4in = 1; end
         endcase
     end
 endmodule

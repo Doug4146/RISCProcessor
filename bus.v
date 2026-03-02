@@ -1,57 +1,56 @@
 module bus (
-    // Select Signals (Encoders)
-    input BusMuxOutR0, BusMuxOutR1, BusMuxOutR2, BusMuxOutR3,
-    input BusMuxOutR4, BusMuxOutR5, BusMuxOutR6, BusMuxOutR7,
-    input BusMuxOutR8, BusMuxOutR9, BusMuxOutR10, BusMuxOutR11,
-    input BusMuxOutR12, BusMuxOutR13, BusMuxOutR14, BusMuxOutR15,
-	 input BusMuxOutHI, BusMuxOutLO,
-	 input BusMuxOutZhigh, BusMuxOutZlow,
-    input BusMuxOutPC, BusMuxOutMDR,  
-	 input BusMuxOutInPort, BusMuxOutC,
+    // Select Signals 
+    input R0out, R1out, R2out, R3out,
+    input R4out, R5out, R6out, R7out,
+    input R8out, R9out, R10out, R11out,
+    input R12out, R13out, R14out, R15out,
+    input HIout, LOout,
+    input Zhighout, Zlowout,
+    input PCout, MDRout,  
+    input InPortout, Cout,
 
-    // Data Inputs (The wires coming from registers)
-    input [31:0] BusMuxInR0, BusMuxInR1, BusMuxInR2, BusMuxInR3,
-    input [31:0] BusMuxInR4, BusMuxInR5, BusMuxInR6, BusMuxInR7,
-    input [31:0] BusMuxInR8, BusMuxInR9, BusMuxInR10, BusMuxInR11,
-    input [31:0] BusMuxInR12, BusMuxInR13, BusMuxInR14, BusMuxInR15,
-	 input [31:0] BusMuxInHI, BusMuxInLO,
-	 input [31:0] BusMuxInZhigh, BusMuxInZlow,
-    input [31:0] BusMuxInPC, BusMuxInMDR, 
-	 input [31:0] BusMuxInInPort, BusMuxInC,
+    // Data Inputs 
+    input [31:0] R0_val, R1_val, R2_val, R3_val,
+    input [31:0] R4_val, R5_val, R6_val, R7_val,
+    input [31:0] R8_val, R9_val, R10_val, R11_val,
+    input [31:0] R12_val, R13_val, R14_val, R15_val,
+    input [31:0] HI_val, LO_val,
+    input [31:0] Zhigh_val, Zlow_val,
+    input [31:0] PC_val, MDR_val, 
+    input [31:0] InPort_val, C_val,
 
-    output reg [31:0] BusMuxOut
+    output reg [31:0] BusData
 );
 
     always @(*) begin
-        // Default value to avoid latch generation if no signal is high
-        BusMuxOut = 32'h0; 
+        BusData = 32'h0; 
 
         // Selection Logic
-        if (BusMuxOutR0) BusMuxOut = BusMuxInR0;
-        else if (BusMuxOutR1) BusMuxOut = BusMuxInR1;
-        else if (BusMuxOutR2) BusMuxOut = BusMuxInR2;
-		  else if (BusMuxOutR3) BusMuxOut = BusMuxInR3;
-		  else if (BusMuxOutR4) BusMuxOut = BusMuxInR4;
-		  else if (BusMuxOutR5) BusMuxOut = BusMuxInR5;
-		  else if (BusMuxOutR6) BusMuxOut = BusMuxInR6;
-		  else if (BusMuxOutR7) BusMuxOut = BusMuxInR7;
-		  else if (BusMuxOutR8) BusMuxOut = BusMuxInR8;
-		  else if (BusMuxOutR9) BusMuxOut = BusMuxInR9;
-		  else if (BusMuxOutR10) BusMuxOut = BusMuxInR10;
-		  else if (BusMuxOutR11) BusMuxOut = BusMuxInR11;
-		  else if (BusMuxOutR12) BusMuxOut = BusMuxInR12;
-		  else if (BusMuxOutR13) BusMuxOut = BusMuxInR13;
-		  else if (BusMuxOutR14) BusMuxOut = BusMuxInR14;
-        else if (BusMuxOutR15) BusMuxOut = BusMuxInR15;
-		  
-        else if (BusMuxOutHI) BusMuxOut = BusMuxInHI;
-        else if (BusMuxOutLO) BusMuxOut = BusMuxInLO;
-		  else if (BusMuxOutZhigh) BusMuxOut = BusMuxInZhigh;
-        else if (BusMuxOutZlow) BusMuxOut = BusMuxInZlow;
-        else if (BusMuxOutPC) BusMuxOut = BusMuxInPC;
-        else if (BusMuxOutMDR) BusMuxOut = BusMuxInMDR;
-		  else if (BusMuxOutInPort) BusMuxOut = BusMuxInInPort; 
-        else if (BusMuxOutC)      BusMuxOut = BusMuxInC;
+        if (R0out) BusData = R0_val;
+        else if (R1out) BusData = R1_val;
+        else if (R2out) BusData = R2_val;
+        else if (R3out) BusData = R3_val;
+        else if (R4out) BusData = R4_val;
+        else if (R5out) BusData = R5_val;
+        else if (R6out) BusData = R6_val;
+        else if (R7out) BusData = R7_val;
+        else if (R8out) BusData = R8_val;
+        else if (R9out) BusData = R9_val;
+        else if (R10out) BusData = R10_val;
+        else if (R11out) BusData = R11_val;
+        else if (R12out) BusData = R12_val;
+        else if (R13out) BusData = R13_val;
+        else if (R14out) BusData = R14_val;
+        else if (R15out) BusData = R15_val;
+          
+        else if (HIout) BusData = HI_val;
+        else if (LOout) BusData = LO_val;
+        else if (Zhighout) BusData = Zhigh_val;
+        else if (Zlowout) BusData = Zlow_val;
+        else if (PCout) BusData = PC_val;
+        else if (MDRout) BusData = MDR_val;
+        else if (InPortout) BusData = InPort_val; 
+        else if (Cout)      BusData = C_val;
         
     end
 endmodule
