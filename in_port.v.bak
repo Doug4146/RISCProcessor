@@ -1,0 +1,6 @@
+module in_port #(parameter DATA_WIDTH_IN = 32, DATA_WIDTH_OUT = 32, INIT = 32'h0) (
+	output wire [DATA_WIDTH_OUT-1:0]BusMuxIn,
+	input wire [DATA_WIDTH_OUT-1:0]input_unit,
+	input clear, clock
+);
+

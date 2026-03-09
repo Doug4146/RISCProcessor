@@ -70,7 +70,7 @@ module neg_tb;
         case (Present_state)
             Reg_load1a: begin Mdatain = 32'h00000005; Read = 1; MDRin = 1; end
             Reg_load1b: begin MDRout = 1; R7in = 1; end
-            Reg_load2a: begin Mdatain = 32'h00000002; Read = 1; MDRin = 1; end
+            Reg_load2a: begin Mdatain = 32'h00000000; Read = 1; MDRin = 1; end
             Reg_load2b: begin MDRout = 1; R4in = 1; end
 
             // instruction execution
