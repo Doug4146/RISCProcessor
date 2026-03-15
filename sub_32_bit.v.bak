@@ -1,0 +1,12 @@
+module sub_32_bit (
+	output wire [31:0] Sout, Cout,
+	input wire [31:0] Ra, Rb
+);
+
+	wire c;
+	wire [31:0] flipped;
+	not_32_bit flip(flipped, Rb);
+	rc_adder add_1(two_comp, c, 32'h00000000, flipped, 32'h00000001);
+	rc_adder sub(Sout, Cout, Ra, two_comp, 1'b0);
+endmodule
+	

@@ -1,0 +1,93 @@
+`timescale 1ns/10ps
+
+module div_tb;
+
+    reg clock, clear;
+    
+    reg PCout, Zlowout, Zhighout, MDRout, R1out, R3out;
+    
+    reg MARin, Zin, PCin, MDRin, IRin, Yin;
+    reg R1in, R3in, HIin, LOin;
+    
+    reg Read, IncPC;
+    reg DIV;         
+    reg [31:0] Mdatain;
+    
+    parameter Default = 4'b0000, Reg_load1a = 4'b0001, Reg_load1b = 4'b0010, Reg_load2a = 4'b0011,
+              Reg_load2b = 4'b0100, T0 = 4'b0111, T1 = 4'b1000, T2 = 4'b1001, 
+              T3 = 4'b1010, T4 = 4'b1011, T5 = 4'b1100, T6 = 4'b1101;
+              
+    reg [3:0] Present_state = Default;
+
+    datapath DUT (
+        .clock(clock),
+        .clear(clear),
+        .PCout(PCout), 
+        .Zlowout(Zlowout),
+		  .Zhighout(Zhighout), 
+        .MDRout(MDRout),
+        .R1out(R1out), 
+        .R3out(R3out),
+        .MARin(MARin), 
+        .Zin(Zin), 
+        .PCin(PCin), 
+        .MDRin(MDRin), 
+        .IRin(IRin), 
+        .Yin(Yin),
+        .R1in(R1in), 
+        .R3in(R3in),
+		  .HIin(HIin),
+		  .LOin(LOin),
+        .Read(Read),
+        .DIV(DIV),     
+        .Mdatain(Mdatain)
+    );
+
+    // Clock Generation
+    initial begin
+        clock = 0;
+        clear = 1;       // clearing all registers so nothing is 'X'
+        #5 clear = 0;    
+        forever #10 clock = ~clock; 
+    end
+
+    always @(posedge clock) begin 
+        case (Present_state)
+            Default    : Present_state = Reg_load1a; 
+            Reg_load1a : Present_state = Reg_load1b; 
+            Reg_load1b : Present_state = Reg_load2a; 
+            Reg_load2a : Present_state = Reg_load2b; 
+            Reg_load2b : Present_state = T0;      
+            T0 : Present_state = T1; 
+            T1 : Present_state = T2; 
+            T2 : Present_state = T3; 
+            T3 : Present_state = T4; 
+            T4 : Present_state = T5; 
+				T5 : Present_state = T6;
+        endcase
+    end
+
+    always @(Present_state) begin
+        // reset everything to 0 at the start of every state
+        PCout = 0; Zlowout = 0; Zhighout = 0; MDRout = 0; R1out = 0; R3out = 0;
+        MARin = 0; Zin = 0; PCin = 0; MDRin = 0; IRin = 0; Yin = 0;
+        IncPC = 0; Read = 0; DIV = 0; HIin = 0; LOin = 0; 
+        R1in = 0; R3in = 0; Mdatain = 32'h00000000;
+
+        case (Present_state)
+            Reg_load1a: begin Mdatain = -1*32'h00000004; Read = 1; MDRin = 1; end
+            Reg_load1b: begin MDRout = 1; R1in = 1; end
+            Reg_load2a: begin Mdatain = -1*32'h0000000E; Read = 1; MDRin = 1; end
+            Reg_load2b: begin MDRout = 1; R3in = 1; end
+
+            // instruction execution
+            T0: begin PCout = 1; MARin = 1; IncPC = 1; Zin = 1; end
+            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h61880000; end
+            T2: begin MDRout = 1; IRin = 1; end
+            T3: begin R3out = 1; Yin = 1; end
+            T4: begin R1out = 1; DIV = 1; Zin = 1; end
+            T5: begin Zlowout = 1; LOin = 1; end
+				T6: begin Zhighout = 1; HIin = 1; end
+        endcase
+    end
+endmodule

@@ -1,0 +1,27 @@
+module div_32_bit(
+    output reg [63:0] result,
+    input wire [31:0] dividend,
+    input wire [31:0] divisor
+);
+	 integer i;
+    reg [31:0] Q;
+    reg [31:0] A;
+    reg [31:0] subOutput;
+	 
+	 for(i=0; i<32; i=i+1) begin
+            A = {A[30:0], Q[31]}; // Shift left
+            subOutput = A - divisor; // Subtract
+
+            if(subOutput[31] == 1'b1) begin
+                Q = {Q[30:0], 1'b0}; // Restore
+            end
+            else begin
+                Q = {Q[30:0], 1'b1}; // Don't restore
+                A = subOutput;
+            end
+        end
+        result = {A, Q}; 
+    end
+endmodule
+
+		

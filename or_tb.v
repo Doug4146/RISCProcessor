@@ -1,18 +1,16 @@
 `timescale 1ns/10ps
 
-module datapath_tb;
+module or_tb;
 
     reg clock, clear;
     
-    reg BusMuxOutPC, BusMuxOutZlow, BusMuxOutMDR, BusMuxOutR5, BusMuxOutR6;
+    reg PCout, Zlowout, MDRout, R5out, R6out;
     
     reg MARin, Zin, PCin, MDRin, IRin, Yin;
     reg R2in, R5in, R6in;
     
     reg Read, IncPC;
-    
-    // 1. Replaced opcode with individual 1-bit ALU control signals [cite: 296]
-    reg AND, OR, ADD, SUB;         
+    reg OR;         
     reg [31:0] Mdatain;
     
     parameter Default = 4'b0000, Reg_load1a = 4'b0001, Reg_load1b = 4'b0010, Reg_load2a = 4'b0011,
@@ -21,15 +19,14 @@ module datapath_tb;
               
     reg [3:0] Present_state = Default;
 
-    // 2. Updated datapath instantiation to match the new 1-bit signals
     datapath DUT (
         .clock(clock),
         .clear(clear),
-        .BusMuxOutPC(BusMuxOutPC), 
-        .BusMuxOutZlow(BusMuxOutZlow), 
-        .BusMuxOutMDR(BusMuxOutMDR),
-        .BusMuxOutR5(BusMuxOutR5), 
-        .BusMuxOutR6(BusMuxOutR6),
+        .PCout(PCout), 
+        .Zlowout(Zlowout), 
+        .MDRout(MDRout),
+        .R5out(R5out), 
+        .R6out(R6out),
         .MARin(MARin), 
         .Zin(Zin), 
         .PCin(PCin), 
@@ -40,10 +37,7 @@ module datapath_tb;
         .R5in(R5in), 
         .R6in(R6in),
         .Read(Read),
-        .AND(AND),
-        .OR(OR),
-        .ADD(ADD),
-        .SUB(SUB),     
+        .OR(OR),     
         .Mdatain(Mdatain)
     );
 
@@ -74,33 +68,26 @@ module datapath_tb;
 
     always @(Present_state) begin
         // reset everything to 0 at the start of every state
-        BusMuxOutPC = 0; BusMuxOutZlow = 0; BusMuxOutMDR = 0; BusMuxOutR5 = 0; BusMuxOutR6 = 0;
+        PCout = 0; Zlowout = 0; MDRout = 0; R5out = 0; R6out = 0;
         MARin = 0; Zin = 0; PCin = 0; MDRin = 0; IRin = 0; Yin = 0;
-        IncPC = 0; Read = 0; 
-        
-        // 3. Reset individual ALU signals to 0 [cite: 341]
-        AND = 0; OR = 0; ADD = 0; SUB = 0; 
-        
+        IncPC = 0; Read = 0; OR = 0; 
         R2in = 0; R5in = 0; R6in = 0; Mdatain = 32'h00000000;
 
         case (Present_state)
             Reg_load1a: begin Mdatain = 32'h00000034; Read = 1; MDRin = 1; end
-            Reg_load1b: begin BusMuxOutMDR = 1; R5in = 1; end
+            Reg_load1b: begin MDRout = 1; R5in = 1; end
             Reg_load2a: begin Mdatain = 32'h00000045; Read = 1; MDRin = 1; end
-            Reg_load2b: begin BusMuxOutMDR = 1; R6in = 1; end
+            Reg_load2b: begin MDRout = 1; R6in = 1; end
             Reg_load3a: begin Mdatain = 32'h00000067; Read = 1; MDRin = 1; end
-            Reg_load3b: begin BusMuxOutMDR = 1; R2in = 1; end
+            Reg_load3b: begin MDRout = 1; R2in = 1; end
 
             // instruction execution
-            T0: begin BusMuxOutPC = 1; MARin = 1; IncPC = 1; Zin = 1; end
-            T1: begin BusMuxOutZlow = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h112B0000; end
-            T2: begin BusMuxOutMDR = 1; IRin = 1; end
-            T3: begin BusMuxOutR5 = 1; Yin = 1; end
-            
-            // 4. Assert the 1-bit OR control signal in T4 [cite: 543]
-            T4: begin BusMuxOutR6 = 1; OR = 1; Zin = 1; end
-            
-            T5: begin BusMuxOutZlow = 1; R2in = 1; end
+            T0: begin PCout = 1; MARin = 1; IncPC = 1; Zin = 1; end
+            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; Mdatain = 32'h192B0000; end
+            T2: begin MDRout = 1; IRin = 1; end
+            T3: begin R5out = 1; Yin = 1; end
+            T4: begin R6out = 1; OR = 1; Zin = 1; end
+            T5: begin Zlowout = 1; R2in = 1; end
         endcase
     end
 endmodule
