@@ -161,3 +161,6 @@ set_global_assignment -name EDA_TEST_BENCH_FILE not_tb.v -section_id not_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE mul_tb.v -section_id mul_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE div_tb.v -section_id div_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE rol_tb.v -section_id rol_tb
+set_global_assignment -name VERILOG_FILE in_port.v
+set_global_assignment -name VERILOG_FILE out_port.v
+set_global_assignment -name VERILOG_FILE mfhi_tb.v
