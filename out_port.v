@@ -7,10 +7,10 @@ module out_port #(parameter WIDTH = 32, INIT = 32'h0) (
 always @ (posedge clock)
 		begin 
 			if (clear) begin
-				bus_input <= INIT;
+				output_unit <= INIT;
 			end
 			else if (enable) begin
-				bus_input <= output_unit;
+				output_unit <= bus_input;
 			end
 		end
 endmodule

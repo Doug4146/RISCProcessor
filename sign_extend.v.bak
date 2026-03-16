@@ -1,0 +1,8 @@
+module sign_extend(
+	output wire [31:0] C_out_extended,
+	input wire [31:0] IR;
+);
+
+	assign C_out_extended = { {13{IR[18]}}, IR[18:0] };
+
+endmodule

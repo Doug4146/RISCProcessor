@@ -142,7 +142,6 @@ set_global_assignment -name EDA_TEST_BENCH_NAME div_tb -section_id eda_simulatio
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id div_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "500 ns" -section_id div_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME div_tb -section_id div_tb
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 set_global_assignment -name EDA_TEST_BENCH_NAME rol_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id rol_tb
 set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "500 ns" -section_id rol_tb
@@ -164,3 +163,9 @@ set_global_assignment -name EDA_TEST_BENCH_FILE rol_tb.v -section_id rol_tb
 set_global_assignment -name VERILOG_FILE in_port.v
 set_global_assignment -name VERILOG_FILE out_port.v
 set_global_assignment -name VERILOG_FILE mfhi_tb.v
+set_global_assignment -name VERILOG_FILE sign_extend.v
+set_global_assignment -name VERILOG_FILE out_tb.v
+set_global_assignment -name VERILOG_FILE in_tb.v
+set_global_assignment -name VERILOG_FILE select_and_encode.v
+set_global_assignment -name VERILOG_FILE con_ff.v
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

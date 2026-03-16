@@ -1,29 +1,36 @@
 module datapath (
     input clock, clear,
+   
+    // PHASE 2: Select and Encode & Control Flow 
+    input Gra, Grb, Grc, Rin, Rout, BAout, Cout,
     
-    input R0out, R1out, R2out, R3out, R4out, R5out, R6out, R7out,
-    input R8out, R9out, R10out, R11out, R12out, R13out, R14out, R15out,
-    
+    // Bus Control Signals
     input HIout, LOout, Zhighout, Zlowout,
-    input PCout, MDRout, InPortout, Cout,
+    input PCout, MDRout, InPortout,
     
-    input R0in, R1in, R2in, R3in, R4in, R5in, R6in, R7in,
-    input R8in, R9in, R10in, R11in, R12in, R13in, R14in, R15in,
-    
+    // Register Enables
     input PCin, IRin, Yin, Zin, MDRin, MARin, HIin, LOin,
     
+    // ALU Control Signals
     input ADD, SUB, AND, OR, SHR, SHRA, SHL, ROR, ROL, DIV, MUL, NEG, NOT,  
-    
     input MUL_start,
     output wire MUL_busy,
     
-    input [31:0] Mdatain,
-    input Read,
+    // Memory Interface
     
-    output wire [31:0] MARout
+    input Read, Write,
+    output wire [31:0] MARout,
+
+    // PHASE 2: I/O Interface 
+    input [31:0] input_unit,      // Switches from the outside world
+    input OutPort_in,             // Enable signal for the output port
+    output wire [31:0] port_display, // LEDs to the outside world
+	 
+	 input CONin,
+	 output wire CON_val
 );
 
-    // Bus wires
+    // Internal Wires 
     wire [31:0] BusData;
     
     wire [31:0] R0_val, R1_val, R2_val, R3_val, R4_val, R5_val, R6_val, R7_val;
@@ -31,22 +38,42 @@ module datapath (
     
     wire [31:0] HI_val, LO_val, Zhigh_val, Zlow_val;
     wire [31:0] PC_val, MDR_val, InPort_val, C_val;
-    
-    wire [31:0] IR_val;
-    
-    wire [31:0] Y_val;
+    wire [31:0] IR_val, Y_val;
     wire [63:0] alu_result;
+
+    wire [15:0] R_in_sig;
+    wire [15:0] R_out_sig;
+    wire [31:0] R0_reg_val;
+
+    // PHASE 2: Select and Encode Logic 
+    select_and_encode SE_Unit (
+        .IR(IR_val),
+        .Gra(Gra),
+        .Grb(Grb),
+        .Grc(Grc),
+        .Rin(Rin),
+        .Rout(Rout),
+        .BAout(BAout),
+        .R_in(R_in_sig),
+        .R_out(R_out_sig)
+    );
+
+    // PHASE 2: Sign Extension Logic 
+    sign_extend Sign_Extender (
+			.C_out_extended(C_val),
+        .IR(IR_val) 
+    );
     
-    //Bus instantiation
+    // Bus Instantiation
     bus Bus (
-        //Select Signals
-        R0out, R1out, R2out, R3out, R4out, R5out, R6out, R7out,
-        R8out, R9out, R10out, R11out, R12out, R13out, R14out, R15out,
+        // Select Signals (Driven by Select and Encode)
+        R_out_sig[0], R_out_sig[1], R_out_sig[2], R_out_sig[3], R_out_sig[4], R_out_sig[5], R_out_sig[6], R_out_sig[7],
+        R_out_sig[8], R_out_sig[9], R_out_sig[10], R_out_sig[11], R_out_sig[12], R_out_sig[13], R_out_sig[14], R_out_sig[15],
         
         HIout, LOout, Zhighout, Zlowout,
         PCout, MDRout, InPortout, Cout,
         
-        //Data Inputs
+        // Data Inputs
         R0_val, R1_val, R2_val, R3_val, R4_val, R5_val, R6_val, R7_val,
         R8_val, R9_val, R10_val, R11_val, R12_val, R13_val, R14_val, R15_val,
         
@@ -55,67 +82,91 @@ module datapath (
         PC_val, MDR_val,
         InPort_val, C_val,
         
-        //Output
+        // Output
         BusData
     );
     
-    register R0 (R0_val, clock, clear, R0in, BusData);
-    register R1 (R1_val, clock, clear, R1in, BusData);  
-    register R2 (R2_val, clock, clear, R2in, BusData);
-    register R3 (R3_val, clock, clear, R3in, BusData);
-    register R4 (R4_val, clock, clear, R4in, BusData);
-    register R5 (R5_val, clock, clear, R5in, BusData);
-    register R6 (R6_val, clock, clear, R6in, BusData);
-    register R7 (R7_val, clock, clear, R7in, BusData);
-    register R8 (R8_val, clock, clear, R8in, BusData);
-    register R9 (R9_val, clock, clear, R9in, BusData);
-    register R10 (R10_val, clock, clear, R10in, BusData);
-    register R11 (R11_val, clock, clear, R11in, BusData);
-    register R12 (R12_val, clock, clear, R12in, BusData);
-    register R13 (R13_val, clock, clear, R13in, BusData);
-    register R14 (R14_val, clock, clear, R14in, BusData);
-    register R15 (R15_val, clock, clear, R15in, BusData);
+    // PHASE 2: Revised R0 Logic 
+    register R0_internal (R0_reg_val, clock, clear, R_in_sig[0], BusData);
+    assign R0_val = {32{~BAout}} & R0_reg_val; // Outputs 0 if BAout is high
 
+    // General Purpose Registers 
+    register R1 (R1_val, clock, clear, R_in_sig[1], BusData);  
+    register R2 (R2_val, clock, clear, R_in_sig[2], BusData);
+    register R3 (R3_val, clock, clear, R_in_sig[3], BusData);
+    register R4 (R4_val, clock, clear, R_in_sig[4], BusData);
+    register R5 (R5_val, clock, clear, R_in_sig[5], BusData);
+    register R6 (R6_val, clock, clear, R_in_sig[6], BusData);
+    register R7 (R7_val, clock, clear, R_in_sig[7], BusData);
+    register R8 (R8_val, clock, clear, R_in_sig[8], BusData);
+    register R9 (R9_val, clock, clear, R_in_sig[9], BusData);
+    register R10 (R10_val, clock, clear, R_in_sig[10], BusData);
+    register R11 (R11_val, clock, clear, R_in_sig[11], BusData);
+    register R12 (R12_val, clock, clear, R_in_sig[12], BusData);
+    register R13 (R13_val, clock, clear, R_in_sig[13], BusData);
+    register R14 (R14_val, clock, clear, R_in_sig[14], BusData);
+    register R15 (R15_val, clock, clear, R_in_sig[15], BusData);
+
+    // Special Registers 
     register PC (PC_val, clock, clear, PCin, BusData);
-    register IR (IR_val, clock, clear, IRin, BusData); 
-
+    register IR (IR_val, clock, clear, IRin, BusData);
     register HI (HI_val, clock, clear, HIin, BusData);
     register LO (LO_val, clock, clear, LOin, BusData);
     
-    register Y (
-        Y_val, 
-        clock, clear, Yin, 
-        BusData
+    register Y (Y_val, clock, clear, Yin, BusData);
+    register ZHi (Zhigh_val, clock, clear, Zin, alu_result[63:32]);
+    register ZLo (Zlow_val, clock, clear, Zin, alu_result[31:0]);  
+    register MAR (MARout, clock, clear, MARin, BusData);  
+	 
+	 wire [31:0] ram_dataout;
+
+    // PHASE 2: Memory Subsystem  
+    ram RAM_Unit (
+        .clk(clock),
+        .read(Read),
+        .write(Write),
+        .address(MARout[8:0]),     // RAM only needs the lower 9 bits of the MAR
+        .datain(MDR_val),          // Data to be stored comes from the MDR
+        .dataout(ram_dataout)      // Data loaded from RAM goes to the MDR wire
     );
-    register ZHi (
-        Zhigh_val,
-        clock, clear, Zin, 
-        alu_result[63:32]  
-    );
-    register ZLo (
-        Zlow_val,
-        clock, clear, Zin, 
-        alu_result[31:0]      
-    );  
-    
-    register MAR (
-        MARout,
-        clock, clear, MARin, 
-        BusData
-    );  
     
     mdr MDR_Unit (
-        MDR_val, BusData, Mdatain,
+        MDR_val, BusData, ram_dataout,
         Read,
         clock, clear, MDRin
     );
+
+    // PHASE 2: I/O Registers 
+	in_port Input_Unit (
+        .to_bus(InPort_val),     // Maps to your new output reg
+        .input_unit(input_unit), // Maps to the top-level external switch input
+        .clear(clear), 
+        .clock(clock)
+    );
     
+    out_port Output_Unit (
+        .output_unit(port_display), // Maps to the top-level external LED output
+        .bus_input(BusData),        // Maps to the new input wire
+        .clock(clock), 
+        .clear(clear), 
+        .enable(OutPort_in)         // Maps to your new enable control signal
+    );
+	 
+	 // PHASE 2: Condition ff
+	 con_ff Condition_Logic (
+			.con_out(CON_val),
+			.IR_condition(IR_val[20:19]),
+			.bus_in(BusData),
+			.con_in(CONin)
+	 );
+    
+    // ALU
     alu ALU_Unit(
-        alu_result,    //Rc
+        alu_result,    
         MUL_busy,
         clock, clear, MUL_start,
-        Y_val,         //Ra
-        BusData,       //Rb
+        Y_val,         
+        BusData,       
         ADD, SUB, AND, OR, SHR, SHRA, SHL, ROR, ROL, DIV, MUL, NEG, NOT
     );
     

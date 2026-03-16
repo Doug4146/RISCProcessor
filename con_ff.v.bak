@@ -1,0 +1,28 @@
+module con_ff(
+	output reg con_out,
+	input wire [1:0] IR,
+	input wire [31:0] bus_in,
+	input wire con_in
+);
+
+	reg condition_met;
+
+    // combinational evaluation
+    always @(*) begin
+        case(IR_condition)
+            2'b00: condition_met = (bus_in == 32'h00000000); // Equal zero
+            2'b01: condition_met = (bus_in != 32'h00000000); // Not equal zero
+            2'b10: condition_met = (bus_in[31] == 0);        // Greater than or equal to zero (Positive)
+            2'b11: condition_met = (bus_in[31] == 1);        // Less than zero (Negative)
+        endcase
+    end
+
+    // Only update the output if enabled
+    always @(*) begin
+        if (con_in) begin
+            con_out = condition_met;
+        end
+    end
+
+endmodule
+	

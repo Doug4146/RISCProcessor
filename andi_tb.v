@@ -1,0 +1,85 @@
+`timescale 1ns/10ps
+
+module andi_tb;
+    reg clock, clear;
+
+    // Phase 2 Control Signals
+    reg Gra, Grb, Grc, Rin, Rout, BAout, Cout;
+    reg HIout, LOout, Zhighout, Zlowout, PCout, MDRout, InPortout;
+    reg MARin, Zin, PCin, MDRin, IRin, Yin, HIin, LOin;
+    reg ADD, SUB, AND, OR, SHR, SHRA, SHL, ROR, ROL, DIV, MUL, NEG, NOT;
+    reg Read, Write, MUL_start, OutPort_in, CONin;
+    reg [31:0] input_unit;
+
+    wire MUL_busy;
+    wire [31:0] MARout, port_display, CON_val;
+
+    parameter Default = 4'b0000, Setup = 4'b0001, 
+              T0 = 4'b0010, T1 = 4'b0011, T2 = 4'b0100, 
+              T3 = 4'b0101, T4 = 4'b0110, T5 = 4'b0111;
+
+    reg [3:0] Present_state = Default;
+
+    datapath DUT (
+        .clock(clock), .clear(clear),
+        .Gra(Gra), .Grb(Grb), .Grc(Grc), .Rin(Rin), .Rout(Rout), .BAout(BAout), .Cout(Cout),
+        .HIout(HIout), .LOout(LOout), .Zhighout(Zhighout), .Zlowout(Zlowout),
+        .PCout(PCout), .MDRout(MDRout), .InPortout(InPortout),
+        .PCin(PCin), .IRin(IRin), .Yin(Yin), .Zin(Zin), .MDRin(MDRin), .MARin(MARin), .HIin(HIin), .LOin(LOin),
+        .ADD(ADD), .SUB(SUB), .AND(AND), .OR(OR), .SHR(SHR), .SHRA(SHRA), .SHL(SHL),
+        .ROR(ROR), .ROL(ROL), .DIV(DIV), .MUL(MUL), .NEG(NEG), .NOT(NOT),
+        .MUL_start(MUL_start), .MUL_busy(MUL_busy),
+        .Read(Read), .Write(Write), .MARout(MARout),
+        .input_unit(input_unit), .OutPort_in(OutPort_in), .port_display(port_display),
+        .CONin(CONin), .CON_val(CON_val)
+    );
+
+    initial begin
+        clock = 0; clear = 1;
+        #5 clear = 0;
+        
+        // RAM[0] andi R7, R4, 0x71 
+        DUT.RAM_Unit.memory[0] = 32'h03A00071; 
+        
+        forever #10 clock = ~clock;
+    end
+
+    always @(posedge clock) begin
+        case (Present_state)
+            Default : Present_state = Setup;
+            Setup   : Present_state = T0;
+            T0      : Present_state = T1;
+            T1      : Present_state = T2;
+            T2      : Present_state = T3;
+            T3      : Present_state = T4;
+            T4      : Present_state = T5;
+        endcase
+    end
+
+    always @(*) begin
+        // Full Reset
+        Gra=0; Grb=0; Grc=0; Rin=0; Rout=0; BAout=0; Cout=0;
+        HIout=0; LOout=0; Zhighout=0; Zlowout=0; PCout=0; MDRout=0; InPortout=0;
+        MARin=0; Zin=0; PCin=0; MDRin=0; IRin=0; Yin=0; HIin=0; LOin=0;
+        ADD=0; SUB=0; AND=0; OR=0; SHR=0; SHRA=0; SHL=0; ROR=0; ROL=0; DIV=0; MUL=0; NEG=0; NOT=0;
+        Read=0; Write=0; MUL_start=0; OutPort_in=0; CONin=0;
+        input_unit = 32'h00000000;
+
+        case (Present_state)
+            Setup: begin
+                // Preload R4 with 0xA5
+                input_unit = 32'h00400000;
+                InPortout = 1; IRin = 1; 
+                #2 input_unit = 32'h000000A5; 
+                InPortout = 1; Grb = 1; Rin = 1; 
+            end
+
+            T0: begin PCout = 1; MARin = 1; Zin = 1; end 
+            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; end 
+            T2: begin MDRout = 1; IRin = 1; end
+            T3: begin Grb = 1; Rout = 1; Yin = 1; end         // Put R4 (0xA5) onto bus, latch to Y
+            T4: begin Cout = 1; AND = 1; Zin = 1; end         // Dump 0x71 onto bus, ALU bitwise ANDs Y & 0x71 -> Z
+            T5: begin Zlowout = 1; Gra = 1; Rin = 1; end      // Write Z (0x21) into R7
+        endcase
+    end
+endmodule

@@ -6,10 +6,8 @@ module select_and_encode (
     input wire Rin,
     input wire Rout,
     input wire BAout,
-    input wire Cout,
     output wire [15:0] R_in,
-    output wire [15:0] R_out,
-    output wire [31:0] C_sign_extended
+    output wire [15:0] R_out
 );
 
     // Extract the Ra, Rb, and Rc fields from the Instruction Register (IR)
@@ -31,14 +29,7 @@ module select_and_encode (
     // 3. Generate R_in and R_out control signals
     assign R_in = decoder_out & {16{Rin}};
 
-    // R1 to R15 out signals are simply ANDed with Rout
-    assign R_out[15:1] = decoder_out[15:1] & {15{Rout}};
-
-    // R0 out signal is ANDed with (Rout OR BAout) to support Load/Store
-    assign R_out[0] = decoder_out[0] & (Rout | BAout);
-
-    // 4. Sign-extend constant C
-    // Fans out IR[18] to all higher-order bits when Cout is asserted
-    assign C_sign_extended = Cout ? { {14{IR[18]}}, IR[17:0] } : 32'b0;
+    // Fixed: BAout now correctly applies to ALL registers so offset addressing works
+    assign R_out = decoder_out & {16{Rout | BAout}};
 
 endmodule

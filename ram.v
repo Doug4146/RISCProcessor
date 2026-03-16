@@ -9,22 +9,23 @@ module ram (
 
     reg [31:0] memory [511:0];
 
+    // Synchronous Write (Only updates memory on the clock edge)
     always @(posedge clk) begin
         if (write) begin
             memory[address] <= datain;
         end
+    end
+
+    // Asynchronous Read (Instantly updates dataout when address or read signal changes)
+    always @(*) begin
         if (read) begin
-            dataout <= memory[address];
+            dataout = memory[address];
+        end else begin
+            dataout = 32'h00000000; // Default zero to keep the bus clean
         end
     end
 
     initial begin
-        // You can use $readmemh to load a hex file:
-        // $readmemh("memory_init.hex", memory);
-        
-        // Alternatively, you can hardcode the initialization values 
-        // required for the lab test cases directly here:
-        
         // Initialize for Load Instructions testing
         memory[9'h065] = 32'h00000084; // Initialize (0x65) = 0x84 
         memory[9'h0C9] = 32'h0000002B; // Initialize (0xC9) = 0x2B 
