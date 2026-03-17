@@ -12,17 +12,15 @@ module ldi_tb;
     reg [31:0] input_unit;
 
     wire MUL_busy;
-    wire [31:0] MARout, port_display, CON_val;
+    wire [31:0] MARout, port_display;
+	 wire CON_val;
 
     // State machine for two back-to-back cases (Shorter, ldi takes fewer steps)
-    parameter Default = 5'b00000, Setup = 5'b00001, 
-              T0  = 5'b00010, T1  = 5'b00011, T2  = 5'b00100, 
-              T3  = 5'b00101, T4  = 5'b00110, T5  = 5'b00111,
-              Setup2= 5'b01000,
-              T6  = 5'b01001, T7  = 5'b01010, T8  = 5'b01011, 
-              T9  = 5'b01100, T10 = 5'b01101, T11 = 5'b01110;
+    parameter Default = 5'b00000, 
+              T0  = 5'b00001, T1  = 5'b00010, T2  = 5'b00011, 
+              T3  = 5'b00100, T4  = 5'b00101, T5  = 5'b00110;
 
-    reg [4:0] Present_state = Default;
+    reg [3:0] Present_state = Default;
 
     datapath DUT (
         .clock(clock), .clear(clear),
@@ -37,35 +35,41 @@ module ldi_tb;
         .input_unit(input_unit), .OutPort_in(OutPort_in), .port_display(port_display),
         .CONin(CONin), .CON_val(CON_val)
     );
+	 
+	 initial begin
+        clock = 0;
+        forever #10 clock = ~clock; 
+    end
 
     initial begin
-        clock = 0; clear = 1;
-        #5 clear = 0;
+        clear = 1;
+        #25 clear = 0;
       
         DUT.RAM_Unit.memory[0] = 32'h03800065; // RAM[0]: ldi R7, 0x65
         DUT.RAM_Unit.memory[1] = 32'h00100072; // RAM[1]: ldi R0, 0x72(R2)
-        
-        forever #10 clock = ~clock;
+		  
+		  force DUT.R0_reg_val = 32'hFFFFFFFF; 
+        #120; 
+		  
+        force DUT.PC_val = 32'h00000001; 
+        force DUT.R2_val = 32'h00000057; // 0x57 + 0x72 = 0xC9
+		  
+		  release DUT.R0_reg_val;
+		  
+        #120;
+
+        $stop;
     end
 
     always @(posedge clock) begin
         case (Present_state)
-            Default : Present_state = Setup;
-            Setup   : Present_state = T0;
-            // CASE 3: ldi R7, 0x65
+            Default : Present_state = T0;
             T0      : Present_state = T1;
             T1      : Present_state = T2;
             T2      : Present_state = T3;
             T3      : Present_state = T4;
             T4      : Present_state = T5;
-            T5      : Present_state = Setup2;
-            // CASE 4: ldi R0, 0x72(R2)
-            Setup2  : Present_state = T6;
-            T6      : Present_state = T7;
-            T7      : Present_state = T8;
-            T8      : Present_state = T9;
-            T9      : Present_state = T10;
-            T10     : Present_state = T11;
+            T5      : Present_state = T0;
         endcase
     end
 
@@ -79,13 +83,6 @@ module ldi_tb;
         input_unit = 32'h00000000;
 
         case (Present_state)
-            // Initialize R2 = 0x57 for Case 4
-            Setup: begin
-                input_unit = 32'h00200000;
-                InPortout = 1; IRin = 1; //  put dummy instruction in IR to trick decoder
-                #2 input_unit = 32'h00000057; // Setup actual data
-                InPortout = 1; Grb = 1; Rin = 1; // Load 0x57 into R2
-            end
 
             //  ldi R7, 0x65
             T0: begin PCout = 1; MARin = 1; Zin = 1; end 
@@ -95,19 +92,7 @@ module ldi_tb;
             T4: begin Cout = 1; ADD = 1; Zin = 1; end         
             T5: begin Zlowout = 1; Gra = 1; Rin = 1; end      
 
-            // point PC to RAM address 1 for the next instruction
-            Setup2: begin
-                input_unit = 32'h00000001;
-                InPortout = 1; PCin = 1;
-            end
-
-            // ldi R0, 0x72(R2)
-            T6:  begin PCout = 1; MARin = 1; Zin = 1; end 
-            T7:  begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; end 
-            T8:  begin MDRout = 1; IRin = 1; end
-            T9:  begin Grb = 1; BAout = 1; Yin = 1; end        
-            T10: begin Cout = 1; ADD = 1; Zin = 1; end         
-            T11: begin Zlowout = 1; Gra = 1; Rin = 1; end      
+                
         endcase
     end
 endmodule

@@ -14,9 +14,9 @@ module andi_tb;
     wire MUL_busy;
     wire [31:0] MARout, port_display, CON_val;
 
-    parameter Default = 4'b0000, Setup = 4'b0001, 
-              T0 = 4'b0010, T1 = 4'b0011, T2 = 4'b0100, 
-              T3 = 4'b0101, T4 = 4'b0110, T5 = 4'b0111;
+    parameter Default = 4'b0000, 
+              T0 = 4'b0001, T1 = 4'b0010, T2 = 4'b0011, 
+              T3 = 4'b0100, T4 = 4'b0101, T5 = 4'b0110;
 
     reg [3:0] Present_state = Default;
 
@@ -33,21 +33,27 @@ module andi_tb;
         .input_unit(input_unit), .OutPort_in(OutPort_in), .port_display(port_display),
         .CONin(CONin), .CON_val(CON_val)
     );
+	 
+	 initial begin
+        clock = 0;
+        forever #10 clock = ~clock; 
+    end
 
     initial begin
-        clock = 0; clear = 1;
-        #5 clear = 0;
+		  clear = 1;
+        #25 clear = 0;
         
         // RAM[0] andi R7, R4, 0x71 
         DUT.RAM_Unit.memory[0] = 32'h03A00071; 
+		  
+		  force DUT.R4_val = 32'h0000000F;
         
-        forever #10 clock = ~clock;
+        //forever #10 clock = ~clock;
     end
 
     always @(posedge clock) begin
         case (Present_state)
-            Default : Present_state = Setup;
-            Setup   : Present_state = T0;
+            Default : Present_state = T0;
             T0      : Present_state = T1;
             T1      : Present_state = T2;
             T2      : Present_state = T3;
@@ -66,14 +72,7 @@ module andi_tb;
         input_unit = 32'h00000000;
 
         case (Present_state)
-            Setup: begin
-                // Preload R4 with 0xA5
-                input_unit = 32'h00400000;
-                InPortout = 1; IRin = 1; 
-                #2 input_unit = 32'h000000A5; 
-                InPortout = 1; Grb = 1; Rin = 1; 
-            end
-
+          
             T0: begin PCout = 1; MARin = 1; Zin = 1; end 
             T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; end 
             T2: begin MDRout = 1; IRin = 1; end

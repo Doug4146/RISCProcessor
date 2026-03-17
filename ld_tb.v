@@ -12,17 +12,14 @@ module ld_tb;
     reg [31:0] input_unit;
 
     wire MUL_busy;
-    wire [31:0] MARout, port_display, CON_val;
+    wire [31:0] MARout, port_display;
+    wire CON_val;
 
-    // Extended state machine for two  cases
-    parameter Default = 5'b00000, Setup = 5'b00001, 
-              T0  = 5'b00010, T1  = 5'b00011, T2  = 5'b00100, T3  = 5'b00101,
-              T4  = 5'b00110, T5  = 5'b00111, T6  = 5'b01000, T7  = 5'b01001,
-              Setup2= 5'b01010,
-              T8  = 5'b01011, T9  = 5'b01100, T10 = 5'b01101, T11 = 5'b01110,
-              T12 = 5'b01111, T13 = 5'b10000, T14 = 5'b10001, T15 = 5'b10010;
+    parameter Default = 4'b0000, 
+              T0 = 4'b0001, T1 = 4'b0010, T2 = 4'b0011, T3 = 4'b0100,
+              T4 = 4'b0101, T5 = 4'b0110, T6 = 4'b0111, T7 = 4'b1000;
 
-    reg [4:0] Present_state = Default;
+    reg [3:0] Present_state = Default;
 
     datapath DUT (
         .clock(clock), .clear(clear),
@@ -39,24 +36,36 @@ module ld_tb;
     );
 
     initial begin
-        clock = 0; clear = 1;
-        #5 clear = 0;
-      
-        //  memory addresses preloaded with data 
+        clock = 0;
+        forever #10 clock = ~clock; 
+    end
+
+    initial begin
+        clear = 1;
+        #25 clear = 0; // Clear finishes at 25ns
+        
+        // Load RAM with all test data
         DUT.RAM_Unit.memory[9'h065] = 32'h00000084; // Case 1 
         DUT.RAM_Unit.memory[9'h0C9] = 32'h0000002B; // Case 2
+        DUT.RAM_Unit.memory[0] = 32'h03800065;      // RAM[0]: ld R7, 0x65
+        DUT.RAM_Unit.memory[1] = 32'h00100072;      // RAM[1]: ld R0, 0x72(R2)
 
-        DUT.RAM_Unit.memory[0] = 32'h03800065; // RAM[0]: ld R7, 0x65
-        DUT.RAM_Unit.memory[1] = 32'h00100072; // RAM[1]: ld R0, 0x72(R2)
+        // wait 8 clock cycles (8 * 20ns = 160ns) for T0-T7 to complete.
+        #160; 
+
+        force DUT.PC_val = 32'h00000001; 
+        force DUT.R2_val = 32'h00000057; // Setup R2 for the math
         
-        forever #10 clock = ~clock;
+        // Wait another 8 clock cycles for Case 2 to finish
+        #160;
+
+        
+        $stop; // Pauses ModelSim so it doesn't run forever
     end
 
     always @(posedge clock) begin
         case (Present_state)
-            Default : Present_state = Setup;
-            Setup   : Present_state = T0;
-            // CASE 1: ld R7, 0x65
+            Default : Present_state = T0;
             T0      : Present_state = T1;
             T1      : Present_state = T2;
             T2      : Present_state = T3;
@@ -64,16 +73,7 @@ module ld_tb;
             T4      : Present_state = T5;
             T5      : Present_state = T6;
             T6      : Present_state = T7;
-            T7      : Present_state = Setup2;
-            // CASE 2: ld R0, 0x72(R2)
-            Setup2  : Present_state = T8;
-            T8      : Present_state = T9;
-            T9      : Present_state = T10;
-            T10     : Present_state = T11;
-            T11     : Present_state = T12;
-            T12     : Present_state = T13;
-            T13     : Present_state = T14;
-            T14     : Present_state = T15;
+            T7      : Present_state = T0; // LOOP BACK TO START!
         endcase
     end
 
@@ -84,42 +84,16 @@ module ld_tb;
         MARin=0; Zin=0; PCin=0; MDRin=0; IRin=0; Yin=0; HIin=0; LOin=0;
         ADD=0; SUB=0; AND=0; OR=0; SHR=0; SHRA=0; SHL=0; ROR=0; ROL=0; DIV=0; MUL=0; NEG=0; NOT=0;
         Read=0; Write=0; MUL_start=0; OutPort_in=0; CONin=0;
-        input_unit = 32'h00000000;
 
         case (Present_state)
-            // Initialize R2 = 0x57 for Case 2 
-            Setup: begin
-                input_unit = 32'h00200000;
-                InPortout = 1; IRin = 1; // put dummy instruction in IR to trick decoder
-                #2 input_unit = 32'h00000057; // Setup actual data
-                InPortout = 1; Grb = 1; Rin = 1; // Load 0x57 into R2
-            end
-
-            // CASE 1: ld R7, 0x65 
             T0: begin PCout = 1; MARin = 1; Zin = 1; end 
-            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; end // Reads RAM[0] (0x03800065) 
+            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; end 
             T2: begin MDRout = 1; IRin = 1; end
             T3: begin Grb = 1; BAout = 1; Yin = 1; end         
             T4: begin Cout = 1; ADD = 1; Zin = 1; end         
             T5: begin Zlowout = 1; MARin = 1; end             
             T6: begin Read = 1; MDRin = 1; end                
-            T7: begin MDRout = 1; Gra = 1; Rin = 1; end       
-
-            // Manually point PC to RAM address 1 for the next instruction
-            Setup2: begin
-                input_unit = 32'h00000001;
-                InPortout = 1; PCin = 1;
-            end
-
-            // CASE 2: ld R0, 0x72(R2) 
-            T8:  begin PCout = 1; MARin = 1; Zin = 1; end 
-            T9:  begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; end // Reads RAM[1] (0x00100072) 
-            T10: begin MDRout = 1; IRin = 1; end
-            T11: begin Grb = 1; BAout = 1; Yin = 1; end        
-            T12: begin Cout = 1; ADD = 1; Zin = 1; end         
-            T13: begin Zlowout = 1; MARin = 1; end             
-            T14: begin Read = 1; MDRin = 1; end                
-            T15: begin MDRout = 1; Gra = 1; Rin = 1; end       
+            T7: begin MDRout = 1; Gra = 1; Rin = 1; end        
         endcase
     end
 endmodule

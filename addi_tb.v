@@ -14,10 +14,9 @@ module addi_tb;
     wire MUL_busy;
     wire [31:0] MARout, port_display, CON_val;
 
-    // Simplified state machine for a single case
-    parameter Default = 4'b0000, Setup = 4'b0001, 
-              T0 = 4'b0010, T1 = 4'b0011, T2 = 4'b0100, 
-              T3 = 4'b0101, T4 = 4'b0110, T5 = 4'b0111;
+    parameter Default = 4'b0000, 
+              T0 = 4'b0001, T1 = 4'b0010, T2 = 4'b0011, 
+              T3 = 4'b0100, T4 = 4'b0101, T5 = 4'b0110;
 
     reg [3:0] Present_state = Default;
 
@@ -36,19 +35,27 @@ module addi_tb;
     );
 
     initial begin
-        clock = 0; clear = 1;
-        #5 clear = 0;
+        clock = 0;
+        forever #10 clock = ~clock; 
+    end
+
+    //INITIALIZATION 
+    initial begin
+        clear = 1;
+        #25 clear = 0; // Clear all 'X' states
         
         // RAM[0] addi R7, R4, -9 
         DUT.RAM_Unit.memory[0] = 32'h03A7FFF7; 
         
-        forever #10 clock = ~clock;
+        // Force R4 to 15 (0xF)
+        force DUT.R4_val = 32'h0000000F;
+        
+        //#20 release DUT.R4_val;
     end
 
     always @(posedge clock) begin
         case (Present_state)
-            Default : Present_state = Setup;
-            Setup   : Present_state = T0;
+            Default : Present_state = T0;
             T0      : Present_state = T1;
             T1      : Present_state = T2;
             T2      : Present_state = T3;
@@ -67,21 +74,15 @@ module addi_tb;
         input_unit = 32'h00000000;
 
         case (Present_state)
-            Setup: begin
-                input_unit = 32'h00400000;
-                InPortout = 1; IRin = 1; 
-                
-                // Load 0x25 into R4
-                #2 input_unit = 32'h00000025; 
-                InPortout = 1; Grb = 1; Rin = 1; 
-            end
-
+            // Fetch
             T0: begin PCout = 1; MARin = 1; Zin = 1; end 
             T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; end 
             T2: begin MDRout = 1; IRin = 1; end
-            T3: begin Grb = 1; Rout = 1; Yin = 1; end         // Put R2 (0x15) onto bus, latch to Y
-            T4: begin Cout = 1; ADD = 1; Zin = 1; end         // Dump 0x3A onto bus, ALU adds Y + 0x3A -> Z
-            T5: begin Zlowout = 1; Gra = 1; Rin = 1; end      // Write Z (0x4F) into R1
+            
+            // addi R7, R4, -9
+            T3: begin Grb = 1; Rout = 1; Yin = 1; end         // Put R4 (0xF) onto bus, latch to Y
+            T4: begin Cout = 1; ADD = 1; Zin = 1; end         // Dump -9 onto bus, ALU adds Y + (-9) -> Z
+            T5: begin Zlowout = 1; Gra = 1; Rin = 1; end      // Write Z (0x6) into R7
         endcase
     end
 endmodule

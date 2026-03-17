@@ -1,6 +1,6 @@
 `timescale 1ns/10ps
 
-module ori_tb;
+module jal_tb;
     reg clock, clear;
 
     // Phase 2 Control Signals
@@ -14,9 +14,9 @@ module ori_tb;
     wire MUL_busy;
     wire [31:0] MARout, port_display, CON_val;
 
-    parameter Default = 4'b0000, 
-              T0 = 4'b0001, T1 = 4'b0010, T2 = 4'b0011, 
-              T3 = 4'b0100, T4 = 4'b0101, T5 = 4'b0110;
+    parameter Default = 4'b0000, Setup = 4'b0001, 
+              T0 = 4'b0010, T1 = 4'b0011, T2 = 4'b0100, 
+              T3 = 4'b0101, T4 = 4'b0110, T5 = 4'b0111, T6 = 4'b1000;
 
     reg [3:0] Present_state = Default;
 
@@ -33,30 +33,26 @@ module ori_tb;
         .input_unit(input_unit), .OutPort_in(OutPort_in), .port_display(port_display),
         .CONin(CONin), .CON_val(CON_val)
     );
-	 
-	 initial begin
-        clock = 0;
-        forever #10 clock = ~clock; 
-    end
 
     initial begin
-        clear = 1;
-        #25 clear = 0;
+        clock = 0; clear = 1;
+        #5 clear = 0;
         
-        // RAM[0] ori R7, R4, 0x71 
-        DUT.RAM_Unit.memory[0] = 32'h03A00071; 
+        DUT.RAM_Unit.memory[16] = 32'h9A600001; 
         
-        force DUT.R4_val = 32'h0000000F;
+        forever #10 clock = ~clock;
     end
 
     always @(posedge clock) begin
         case (Present_state)
-            Default : Present_state = T0;
+            Default : Present_state = Setup;
+            Setup   : Present_state = T0;
             T0      : Present_state = T1;
             T1      : Present_state = T2;
             T2      : Present_state = T3;
             T3      : Present_state = T4;
             T4      : Present_state = T5;
+            T5      : Present_state = T6;
         endcase
     end
 
@@ -70,13 +66,35 @@ module ori_tb;
         input_unit = 32'h00000000;
 
         case (Present_state)
-				
+            Setup: begin
+                // Preload R4 with 0x80 
+                input_unit = 32'h02000000; // Dummy instruction: Ra = 4 (0100)
+                InPortout = 1; IRin = 1; 
+                #2 input_unit = 32'h00000080; 
+                InPortout = 1; Gra = 1; Rin = 1; 
+
+                // Preload R12 with 0x00000000 (prove it gets overwritten)
+                #2 input_unit = 32'h06000000; // Dummy instruction: Ra = 12 (1100)
+                InPortout = 1; IRin = 1; 
+                #2 input_unit = 32'h00000000; 
+                InPortout = 1; Gra = 1; Rin = 1; 
+
+                // Preload PC with 0x10
+                #2 input_unit = 32'h00000010;
+                InPortout = 1; PCin = 1;
+            end
+
             T0: begin PCout = 1; MARin = 1; Zin = 1; end 
-            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; end 
+            T1: begin Zlowout = 1; PCin = 1; Read = 1; MDRin = 1; end // Reads RAM[16]
             T2: begin MDRout = 1; IRin = 1; end
-            T3: begin Grb = 1; Rout = 1; Yin = 1; end         // Put R4 (0xA5) onto bus, latch to Y
-            T4: begin Cout = 1; OR = 1; Zin = 1; end         // Dump 0x71 onto bus, ALU bitwise ANDs Y & 0x71 -> Z
-            T5: begin Zlowout = 1; Gra = 1; Rin = 1; end      // Write Z (0x21) into R7
+            
+            // R12 <- PC + 1
+            T3: begin PCout = 1; Yin = 1; end 
+            T4: begin Cout = 1; ADD = 1; Zin = 1; end 
+            T5: begin Zlowout = 1; Grb = 1; Rin = 1; end 
+            
+            // PC <- R4
+            T6: begin Gra = 1; Rout = 1; PCin = 1; end 
         endcase
     end
 endmodule
