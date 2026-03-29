@@ -9,7 +9,7 @@ z2
 cModel Technology
 Z0 dC:/Users/jacks/RISCProcessor
 vadd_tb
-Z1 !s110 1773714585
+Z1 !s110 1774817960
 !i10b 1
 !s100 [@kBBCc1z?ZOgKWe=NNf>0
 IH6BT2nF;fn@iUbJZFKHWh3
@@ -23,9 +23,9 @@ Z4 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z5 !s108 1773714585.000000
-Z6 !s107 sub_tb.v|sub_32_bit.v|st_tb.v|sign_extend.v|shra_tb.v|shra_32_bit.v|shr_tb.v|shr_32_bit.v|shl_tb.v|shl_32_bit.v|select_and_encode.v|ror_tb.v|ror_32_bit.v|rol_tb.v|rol_32_bit.v|register.v|rc_adder_33.v|rc_adder.v|ram.v|out_tb.v|out_port.v|ori_tb.v|or_tb.v|or_32_bit.v|not_tb.v|not_32_bit.v|neg_tb.v|neg_32_bit.v|mul_tb.v|mflo_tb.v|mfhi_tb.v|mdr.v|ldi_tb.v|ld_tb.v|jr_tb.v|jal_tb.v|in_tb.v|in_port.v|full_adder.v|div_tb.v|div_32_bit.v|datapath_tb.v|datapath.v|con_ff.v|bus.v|brzr_tb.v|brpl_tb.v|brnz_tb.v|brmi_tb.v|booth_multiplier.v|andi_tb.v|and_tb.v|and_32_bit.v|alu.v|addi_tb.v|add_tb.v|
-Z7 !s90 -reportprogress|300|add_tb.v|addi_tb.v|alu.v|and_32_bit.v|and_tb.v|andi_tb.v|booth_multiplier.v|brmi_tb.v|brnz_tb.v|brpl_tb.v|brzr_tb.v|bus.v|con_ff.v|datapath.v|datapath_tb.v|div_32_bit.v|div_tb.v|full_adder.v|in_port.v|in_tb.v|jal_tb.v|jr_tb.v|ld_tb.v|ldi_tb.v|mdr.v|mfhi_tb.v|mflo_tb.v|mul_tb.v|neg_32_bit.v|neg_tb.v|not_32_bit.v|not_tb.v|or_32_bit.v|or_tb.v|ori_tb.v|out_port.v|out_tb.v|ram.v|rc_adder.v|rc_adder_33.v|register.v|rol_32_bit.v|rol_tb.v|ror_32_bit.v|ror_tb.v|select_and_encode.v|shl_32_bit.v|shl_tb.v|shr_32_bit.v|shr_tb.v|shra_32_bit.v|shra_tb.v|sign_extend.v|st_tb.v|sub_32_bit.v|sub_tb.v|
+Z5 !s108 1774817960.000000
+Z6 !s107 sub_tb.v|sub_32_bit.v|st_tb.v|sign_extend.v|shra_tb.v|shra_32_bit.v|shr_tb.v|shr_32_bit.v|shl_tb.v|shl_32_bit.v|select_and_encode.v|ror_tb.v|ror_32_bit.v|rol_tb.v|rol_32_bit.v|register.v|rc_adder_33.v|rc_adder.v|ram.v|out_tb.v|out_port.v|ori_tb.v|or_tb.v|or_32_bit.v|not_tb.v|not_32_bit.v|neg_tb.v|neg_32_bit.v|mul_tb.v|mflo_tb.v|mfhi_tb.v|mdr.v|ldi_tb.v|ld_tb.v|jr_tb.v|jal_tb.v|in_tb.v|in_port.v|full_adder.v|div_tb.v|div_32_bit.v|datapath_tb.v|datapath.v|cpu.v|control_unit.v|control_tb.v|con_ff.v|bus.v|brzr_tb.v|brpl_tb.v|brnz_tb.v|brmi_tb.v|booth_multiplier.v|andi_tb.v|and_tb.v|and_32_bit.v|alu.v|addi_tb.v|add_tb.v|
+Z7 !s90 -reportprogress|300|add_tb.v|addi_tb.v|alu.v|and_32_bit.v|and_tb.v|andi_tb.v|booth_multiplier.v|brmi_tb.v|brnz_tb.v|brpl_tb.v|brzr_tb.v|bus.v|con_ff.v|control_tb.v|control_unit.v|cpu.v|datapath.v|datapath_tb.v|div_32_bit.v|div_tb.v|full_adder.v|in_port.v|in_tb.v|jal_tb.v|jr_tb.v|ld_tb.v|ldi_tb.v|mdr.v|mfhi_tb.v|mflo_tb.v|mul_tb.v|neg_32_bit.v|neg_tb.v|not_32_bit.v|not_tb.v|or_32_bit.v|or_tb.v|ori_tb.v|out_port.v|out_tb.v|ram.v|rc_adder.v|rc_adder_33.v|register.v|rol_32_bit.v|rol_tb.v|ror_32_bit.v|ror_tb.v|select_and_encode.v|shl_32_bit.v|shl_tb.v|shr_32_bit.v|shr_tb.v|shra_32_bit.v|shra_tb.v|sign_extend.v|st_tb.v|sub_32_bit.v|sub_tb.v|
 !i113 1
 Z8 tCvgOpt 0
 vaddi_tb
@@ -155,7 +155,7 @@ R1
 I16cSk2SYEFk:miM[@9ORh3
 R2
 R0
-w1773705818
+w1773770884
 8brmi_tb.v
 Fbrmi_tb.v
 L0 3
@@ -175,7 +175,7 @@ R1
 I9S5EC0>nZ4XH2dQ3[2JD<2
 R2
 R0
-w1773698320
+w1773770300
 8brnz_tb.v
 Fbrnz_tb.v
 L0 3
@@ -191,11 +191,11 @@ R8
 vbrpl_tb
 R1
 !i10b 1
-!s100 Z^e]_hQCKQz4Vhn=54SE21
-INPZ7O@CkH6l7ZYj@R<7<50
+!s100 ]7gVdB]>AEYY^l7:U]W>J3
+I4e^h@n59]Wd@XHQzDeJKS0
 R2
 R0
-w1773705225
+w1773769882
 8brpl_tb.v
 Fbrpl_tb.v
 L0 3
@@ -211,11 +211,11 @@ R8
 vbrzr_tb
 R1
 !i10b 1
-!s100 7VGLLlgPXDH=92AA1hJga2
-I[zi_[B7C_<]EHQE0Ie96U0
+!s100 VbaWNf>FYzDkfknOBkhCz3
+IN44ODICj9LjGX?jT<05I[3
 R2
 R0
-w1773697939
+w1773768769
 8brzr_tb.v
 Fbrzr_tb.v
 L0 3
@@ -268,14 +268,74 @@ R6
 R7
 !i113 1
 R8
+vcontrol_tb
+!s110 1774819688
+!i10b 1
+!s100 @:JVn@^Fb;LM6];0D;;B=0
+Ik99i@DAFfH?Q]W0Ko:Nz52
+R2
+R0
+w1774819676
+8control_tb.v
+Fcontrol_tb.v
+L0 3
+R4
+r1
+!s85 0
+31
+!s108 1774819688.000000
+!s107 control_tb.v|
+!s90 -reportprogress|300|control_tb.v|
+!i113 1
+R8
+vcontrol_unit
+R1
+!i10b 1
+!s100 zmcglNBeUZTnS^LQ7BeID2
+IU4Y2SF=eo>_O5SzZk[l9N0
+R2
+R0
+w1774817954
+8control_unit.v
+Fcontrol_unit.v
+L0 2
+R4
+r1
+!s85 0
+31
+R5
+R6
+R7
+!i113 1
+R8
+vcpu
+R1
+!i10b 1
+!s100 HL:e6ME@T7dOJlH_0mG^N0
+Ij1bL8hf@S3z:`?AG14Hk:2
+R2
+R0
+w1774718411
+8cpu.v
+Fcpu.v
+L0 1
+R4
+r1
+!s85 0
+31
+R5
+R6
+R7
+!i113 1
+R8
 vdatapath
 R1
 !i10b 1
-!s100 ]>eTPE;31_89l9E_5NRec3
-Ik4UMk?Xi8FZD6mj6@9BkN1
+!s100 8F`g`cfFlH?m[fO:N76T30
+I5?m[<z]3V7@VcOJO<_`4e2
 R2
 R0
-w1773624949
+w1774815295
 8datapath.v
 Fdatapath.v
 L0 1
@@ -749,13 +809,13 @@ R7
 !i113 1
 R8
 vram
-R1
+!s110 1774818477
 !i10b 1
-!s100 k7znmDLgV2Cl@dBB3N9ji3
-IdJIN`E8jR6CAn`8Kd8;zI1
+!s100 Si_E]MD30^31donZ27cG61
+I;`:eY:86i73a9SK=ZYOYa1
 R2
 R0
-w1773624919
+w1774818467
 8ram.v
 Fram.v
 L0 1
@@ -763,9 +823,9 @@ R4
 r1
 !s85 0
 31
-R5
-R6
-R7
+!s108 1774818477.000000
+!s107 ram.v|
+!s90 -reportprogress|300|ram.v|
 !i113 1
 R8
 vrc_adder

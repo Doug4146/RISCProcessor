@@ -21,8 +21,9 @@ add wave -noupdate -radix hexadecimal /brpl_tb/CON_val
 add wave -noupdate -radix hexadecimal /brpl_tb/Present_state
 add wave -noupdate -radix hexadecimal /brpl_tb/DUT/BusData
 add wave -noupdate -radix hexadecimal /brpl_tb/DUT/R3_val
+add wave -noupdate -radix hexadecimal /brpl_tb/DUT/PC_val
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {241060 ps} 0}
+WaveRestoreCursors {{Cursor 1} {236910 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -38,4 +39,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ps} {525 ns}
+WaveRestoreZoom {0 ps} {245 ns}

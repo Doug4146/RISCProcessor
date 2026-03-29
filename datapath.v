@@ -22,12 +22,15 @@ module datapath (
     output wire [31:0] MARout,
 
     // PHASE 2: I/O Interface 
-    input [31:0] input_unit,      // Switches from the outside world
-    input OutPort_in,             // Enable signal for the output port
-    output wire [31:0] port_display, // LEDs to the outside world
+    input [31:0] In_PortOut,      // Switches from the outside world
+    input Out_PortIn,             // Enable signal for the output port
+    output wire [31:0] port_display, 
 	 
 	 input CONin,
-	 output wire CON_val
+	 output wire CON_val,
+	 
+	 input IncPC,                  // From Control Unit to increment PC
+    output wire [31:0] IR_out		// Opcode decoding in control unit
 );
 
     // Internal Wires 
@@ -40,6 +43,8 @@ module datapath (
     wire [31:0] PC_val, MDR_val, InPort_val, C_val;
     wire [31:0] IR_val, Y_val;
     wire [63:0] alu_result;
+	 
+	 wire [63:0] Z_in_data;
 
     wire [15:0] R_in_sig;
     wire [15:0] R_out_sig;
@@ -110,12 +115,19 @@ module datapath (
     // Special Registers 
     register PC (PC_val, clock, clear, PCin, BusData);
     register IR (IR_val, clock, clear, IRin, BusData);
+	 assign IR_out = IR_val;
+	 
     register HI (HI_val, clock, clear, HIin, BusData);
     register LO (LO_val, clock, clear, LOin, BusData);
     
     register Y (Y_val, clock, clear, Yin, BusData);
-    register ZHi (Zhigh_val, clock, clear, Zin, alu_result[63:32]);
-    register ZLo (Zlow_val, clock, clear, Zin, alu_result[31:0]);  
+	 
+	 // If IncPC is high, add 1 to the BusData, if not take the ALU result.
+	 assign Z_in_data = (IncPC) ? {32'd0, BusData + 32'd1} : alu_result;
+	 
+    register ZHi (Zhigh_val, clock, clear, Zin, Z_in_data[63:32]);
+    register ZLo (Zlow_val, clock, clear, Zin, Z_in_data[31:0]);  
+	 
     register MAR (MARout, clock, clear, MARin, BusData);  
 	 
 	 wire [31:0] ram_dataout;
@@ -139,7 +151,7 @@ module datapath (
     // PHASE 2: I/O Registers 
 	in_port Input_Unit (
         .to_bus(InPort_val),     // Maps to your new output reg
-        .input_unit(input_unit), // Maps to the top-level external switch input
+        .input_unit(In_PortOut), // Maps to the top-level external switch input
         .clear(clear), 
         .clock(clock)
     );
@@ -149,7 +161,7 @@ module datapath (
         .bus_input(BusData),        // Maps to the new input wire
         .clock(clock), 
         .clear(clear), 
-        .enable(OutPort_in)         // Maps to your new enable control signal
+        .enable(Out_PortIn)         // Maps to your new enable control signal
     );
 	 
 	 // PHASE 2: Condition ff

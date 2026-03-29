@@ -25,8 +25,9 @@ add wave -noupdate -radix hexadecimal /brzr_tb/MARout
 add wave -noupdate -radix hexadecimal /brzr_tb/CON_val
 add wave -noupdate -radix decimal /brzr_tb/DUT/BusData
 add wave -noupdate -radix hexadecimal /brzr_tb/DUT/R3_val
+add wave -noupdate -radix decimal /brzr_tb/DUT/PC_val
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {186800 ps} 0}
+WaveRestoreCursors {{Cursor 1} {145190 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100

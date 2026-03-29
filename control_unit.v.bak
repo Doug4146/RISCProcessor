@@ -1,0 +1,19 @@
+`timescale 1ns/10ps
+module control_unit (
+
+	// select & encode signals
+	output reg Gra, Grb, Grc, Rin, Rout, BAout, Cout, 
+	// bus control
+	output reg HIout, LOout, Zhighout, Zlowout, PCout, MDRout, MARout, InPortout,
+	// enables
+	output reg PCin, IRin, Yin, Zin, MDRin, MARin, HIin, LOin,
+	// in + outport
+	output reg Out_PortIn, In_PortOut,
+	
+	output reg Read, Write
+	
+	input [31:0] IR,
+	input clock, clear, stop, CON_val
+);
+
+endmodule

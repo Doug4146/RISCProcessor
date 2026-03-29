@@ -48,7 +48,7 @@ module brpl_tb;
         // brpl R3, 48	 
         DUT.RAM_Unit.memory[0] = 32'hA9900030; 
 		  
-		  force DUT.R3_val = 32'h00000005;
+		  force DUT.R3_val = -1*32'h00000005;
         
         forever #10 clock = ~clock;
     end

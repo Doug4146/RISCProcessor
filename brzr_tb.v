@@ -47,8 +47,9 @@ module brzr_tb;
         
         // brzr R3, 48	 
         DUT.RAM_Unit.memory[0] = 32'hA9800030; 
+		  //10101001100000000000000000110000
 		  
-		  force DUT.R3_val = 32'h00000005;
+		  force DUT.R3_val = 32'h00000000;
         
         forever #10 clock = ~clock;
     end
