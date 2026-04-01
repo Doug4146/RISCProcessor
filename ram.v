@@ -72,7 +72,6 @@ module ram (
         memory[9'h028] = 32'h9E500000; // jal R10
         memory[9'h029] = 32'hD8000000; // halt
 
-        // Phase 3 Test Program - Subroutine Block
         memory[9'h0B2] = 32'h07450000; // subA: add R14, R8, R10
         memory[9'h0B3] = 32'h0ECD8000; // sub R13, R9, R11
         memory[9'h0B4] = 32'h0F768000; // sub R14, R14, R13

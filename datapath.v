@@ -164,7 +164,7 @@ module datapath (
         .enable(Out_PortIn)         // Maps to your new enable control signal
     );
 	 
-	 // PHASE 2: Condition ff
+	 // Condition ff
 	 con_ff Condition_Logic (
 			.con_out(CON_val),
 			.IR_condition(IR_val[20:19]),
